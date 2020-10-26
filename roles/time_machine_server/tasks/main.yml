@@ -1,0 +1,32 @@
+---
+# Steps from: 
+#   1) https://www.grizzly-hills.com/2019/11/02/ubuntu-19-10-setting-up-time-machine/
+#   2) https://raymii.org/s/articles/Build_a_35_dollar_Time_Capsule_-_Raspberry_Pi_Time_Machine.html
+
+- name: Install requires Packages
+  apt:
+    name: ['netatalk', 'avahi-daemon']
+    state: present
+  become: true
+
+- name: Add afp.conf file
+  template:
+    src: templates/afp.conf.j2
+    dest: /etc/netatalk/afp.conf
+  become: true
+
+- name: Create time-machine user and group
+  user:
+    name: time-machine
+    group: time-machine
+    password: ""
+  become: true
+
+- name: Create "{{ mount_path }}" directory
+  file:
+    path: "{{ mount_path }}"
+    state: directory
+    owner: time-machine
+    group: time-machine
+    mode: 0777
+  become: true

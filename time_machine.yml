@@ -1,0 +1,16 @@
+---
+- hosts: homeserver
+  remote_user: homeserver
+  become: true
+  
+  roles:
+  - time_machine_server
+  
+  handlers:
+  - name: restart netatalk service 
+    service:
+      name: netatalk
+      state: restarted
+  
+  vars_files:
+  - vars/homeserver.vault.yml

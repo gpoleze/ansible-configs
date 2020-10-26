@@ -1,16 +1,16 @@
 ---
 - hosts: homeserver
-  remote_user: ansible
+  remote_user: homeserver
   become: true
   
   roles:
-  - time_machine_server
+  - create_ansible_user
   
   handlers:
-  - name: restart netatalk service 
-    service:
-      name: netatalk
+  - name: restart ssh
+    ansible.builtin.service:
+      name: sshd
       state: restarted
-  
+
   vars_files:
   - vars/homeserver.vault.yml

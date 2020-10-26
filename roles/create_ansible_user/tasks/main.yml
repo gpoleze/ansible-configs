@@ -1,0 +1,38 @@
+- name: Create user and groups
+  user:
+    name: ansible
+    group: adm
+    groups: 
+    - microk8s
+    - docker
+    - data
+    shell: /bin/bash
+
+- name: Add ansible user to the sudoers
+  copy:
+    dest: "/etc/sudoers.d/ansible"
+    content: "ansible  ALL=(ALL)  NOPASSWD: ALL"
+
+- name: Deploy SSH Key
+  authorized_key: 
+    user: ansible
+    key: "{{ user_ansible_keys.public }} "
+    state: present
+  
+- name: Disable Password Authentication
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^PasswordAuthentication'
+    line: "PasswordAuthentication no"
+    state: present
+    backup: yes
+
+- name: Disable Root Login
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^PermitRootLogin'
+    line: "PermitRootLogin no"
+    state: present
+    backup: yes
+  notify:
+  - restart ssh

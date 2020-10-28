@@ -1,0 +1,12 @@
+# Steps executed from: https://ubuntu.com/tutorials/install-and-configure-samba#1-overview
+
+---
+- hosts: homeserver
+  remote_user: homeserver
+  become: true
+  
+  roles:
+  - samba_config
+
+  vars_files:
+  - vars/homeserver.vault.yml

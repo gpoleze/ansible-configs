@@ -1,0 +1,50 @@
+- name: Create Sharing folder
+  file:
+    name: "{{ samba_share_path }}"
+    state: directory
+    recurse: yes
+    mode: 0777
+
+- name: Install Samba package
+  apt:
+    name: samba
+    state: present
+
+- name: Copy samba.conf
+  template:
+    src: templates/samba.conf.j2
+    dest: /etc/samba/smb.conf
+
+- name: restart smbd
+  service: 
+    name: smbd
+    state: restarted
+
+- name: Update the firewall rules to allow Samba traffic
+  command: ufw allow samba
+
+- name: Create Users
+  user:
+    name: "{{ item }}"
+    group: data
+    password_lock: yes
+    create_home: no
+  become: true
+  with_items: "{{ users }}"
+
+- name: Get possible existing Samba users
+  shell: >-
+    pdbedit -L | awk -F : '{print $1}'
+  become: true
+  register: possible_existing_samba_users
+
+- name: Set up a Samba password for user account
+  expect:
+    command: smbpasswd -a {{ item }}
+    responses:
+      New(.*): "{{ samba_password[item]}}"
+      Retype(.*): "{{ samba_password[item]}}"
+  with_items: "{{ users }}"
+  vars: 
+    existing_users: "{{ possible_existing_samba_users | json_query('stdout_lines') }}"
+  when: "item not in existing_users"

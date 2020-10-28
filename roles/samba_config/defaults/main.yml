@@ -1,0 +1,4 @@
+samba_share_path: /mnt/nas/SharedArchive
+users: 
+- gabriel
+- gisele

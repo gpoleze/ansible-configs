@@ -11,6 +11,3 @@
     ansible.builtin.service:
       name: sshd
       state: restarted
-
-  vars_files:
-  - vars/homeserver.vault.yml

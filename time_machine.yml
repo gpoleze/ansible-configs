@@ -12,5 +12,3 @@
       name: netatalk
       state: restarted
   
-  vars_files:
-  - vars/homeserver.vault.yml

@@ -4,9 +4,6 @@
 - hosts: homeserver
   remote_user: homeserver
   become: true
-  
-  roles:
-  - samba_config
 
-  vars_files:
-  - vars/homeserver.vault.yml
+  roles:
+    - samba_config

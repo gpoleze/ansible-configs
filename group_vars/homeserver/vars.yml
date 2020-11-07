@@ -9,3 +9,7 @@ user_ansible_keys:
 samba_password: 
   gabriel: "{{ vault_samba_password.gabriel }}"
   gisele: "{{ vault_samba_password.gisele }}"
+
+  # Pihole
+  # pihole_web_password: "{{ vault_pihole_web_password }}"
+  pihole_web_password: "vault_pihole_web_password"

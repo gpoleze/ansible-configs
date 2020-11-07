@@ -1,0 +1,89 @@
+---
+apiVersion: v1
+stringData:
+ PIHOLE_WEBPASSWORD: "{{ pihole_web_password }}"
+kind: Secret
+metadata:
+ name: pihole-environment-variables
+type: Opaque
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pihole
+  labels:
+    app: pihole
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      app: pihole
+  template:
+    metadata:
+      name: pihole-pod
+      labels:
+        app: pihole
+    spec:
+      containers:
+      - name: pihole-container
+        image: pihole/pihole:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+          name: dashboard-http
+          protocol: TCP
+        - containerPort: 443
+          name: dashboard-https
+          protocol: TCP
+        - containerPort: 53
+          name: dns-tcp
+          protocol: TCP
+        - containerPort: 53
+          name: dns-udp
+          protocol: UDP
+        env:
+        - name: TZ
+          value: America/Chicago
+        - name: WEBPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: pihole-environment-variables
+              key: PIHOLE_WEBPASSWORD
+        volumeMounts:
+        - mountPath: /etc/pihole/
+          name: pihole-volume
+        - mountPath: /etc/dnsmasq.d/
+          name: dnsmasq-volume
+              
+      volumes:
+      - name: pihole-volume
+        persistentVolumeClaim:
+          claimName: pihole-pv-claim-pihole
+      - name: dnsmasq-volume
+        persistentVolumeClaim:
+          claimName: pihole-pv-claim-dnsmasq
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pihole-service
+spec:
+  type: NodePort
+  externalTrafficPolicy: Cluster
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+  - name: https
+    port: 443
+    protocol: TCP
+  - name: dns-tcp
+    port: 53
+    protocol: TCP
+  - name: dns-udp
+    port: 53
+    protocol: UDP
+  selector:
+    app: pihole

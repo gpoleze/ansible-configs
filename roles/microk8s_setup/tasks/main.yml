@@ -1,0 +1,14 @@
+# https://dev.to/musabhusaini/remote-development-with-multi-node-microk8s-cluster-and-scaffold-4o1d
+
+- name: install MicroK8s
+  snap:
+    name: microk8s
+    state: present
+
+- name: wait for MicroK8s to be ready
+  command: microk8s status --wait-ready
+  register: wait_result
+  failed_when: "'microk8s is running' not in wait_result.stdout"
+
+- name: add kubectl alias
+  command: snap alias microk8s.kubectl kubectl

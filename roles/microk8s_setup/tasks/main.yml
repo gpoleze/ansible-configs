@@ -38,3 +38,11 @@
   command: 
     cmd: kubectl apply -f hostpath_provisioner_new_deploy.yml
     chdir: /tmp
+
+- name: restart microk8s
+  command: microk8s stop && sudo microk8s start
+
+- name: Cleanup
+  file: 
+    name: /tmp/hostpath_provisioner_new_deploy.yml
+    state: absent

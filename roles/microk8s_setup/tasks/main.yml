@@ -12,3 +12,29 @@
 
 - name: add kubectl alias
   command: snap alias microk8s.kubectl kubectl
+
+- name: enabling microk8s modules
+  command: "microk8s enable {{ item }}"
+  with_items:
+  - dns
+  - ingress 
+  - storage
+
+# Configuring Storage
+- name: get local hostpath-provisioner deploy in kube-system
+  command: microk8s kubectl get -o yaml -n kube-system deploy hostpath-provisioner
+  register: hostpath_provisioner
+
+- name: write hostpath_provisioner new deploy file
+  copy:
+    content: "{{ new_deploy }} "
+    dest: /tmp/hostpath_provisioner_new_deploy.yml
+  vars:
+    old_path: /var/snap/microk8s/common/default-storage
+    new_path: /data/snap/microk8s/common/default-storage
+    new_deploy: "{{ hostpath_provisioner.stdout | replace(old_path, new_path) }}"
+
+- name: apply hostpath_provisioner
+  command: 
+    cmd: kubectl apply -f hostpath_provisioner_new_deploy.yml
+    chdir: /tmp

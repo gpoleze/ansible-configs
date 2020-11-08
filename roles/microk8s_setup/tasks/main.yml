@@ -40,7 +40,11 @@
     chdir: /tmp
 
 - name: restart microk8s
-  command: microk8s stop && sudo microk8s start
+  shell: microk8s stop && sudo microk8s start
+
+- name: generate kubeconfig
+  shell: >-
+    microk8s kubectl config view --raw > $HOME/.kube/config
 
 - name: Cleanup
   file: 

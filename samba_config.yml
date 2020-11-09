@@ -1,4 +1,5 @@
 # Steps executed from: https://ubuntu.com/tutorials/install-and-configure-samba#1-overview
+# Extra configs from https://wiki.samba.org/index.php/Configure_Samba_to_Work_Better_with_Mac_OS_X
 
 ---
 - hosts: homeserver

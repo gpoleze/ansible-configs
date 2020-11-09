@@ -15,10 +15,23 @@
     src: templates/samba.conf.j2
     dest: /etc/samba/smb.conf
 
-- name: restart smbd
+- name: Add Avahi Service folder
+  file: 
+    name: /etc/avahi/services
+    state: directory
+
+- name: add Avahi Service Config
+  copy:
+    src: files/samba.service
+    dest: /etc/avahi/services/samba.service
+
+- name: restart {{ item }}
   service: 
-    name: smbd
+    name: "{{ item }}"
     state: restarted
+  with_items:
+    - smbd
+    - avahi-daemon.service
 
 - name: Update the firewall rules to allow Samba traffic
   command: ufw allow samba

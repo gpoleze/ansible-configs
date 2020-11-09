@@ -167,6 +167,17 @@
 # public shares, not just authenticated ones
    usershare allow guests = yes
 
+############ Mac Related Stuff ############
+   min protocol = SMB2
+   vfs objects = fruit streams_xattr  
+   fruit:metadata = stream
+   fruit:model = RackMac
+   fruit:posix_rename = yes 
+   fruit:veto_appledouble = no
+   fruit:wipe_intentionally_left_blank_rfork = yes 
+   fruit:delete_empty_adfiles = yes 
+
+
 #======================= Share Definitions =======================
 
 # Un-comment the following (and tweak the other settings below to suit)

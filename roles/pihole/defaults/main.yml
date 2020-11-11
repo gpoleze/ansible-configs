@@ -1,5 +1,6 @@
-dns_provider: google
-
+dns_provider: cloudflare
 dns_providers:
   cloudflare: 1.1.1.1
   google: 8.8.8.8
+
+pihole_base: "/mnt/data/pihole"

@@ -13,7 +13,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: "/mnt/data/pihole"
+    path: "/mnt/data/pihole/etc-pihole"
 
 ---
 apiVersion: v1
@@ -30,7 +30,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: "/mnt/data/dnsmasq.d"
+    path: "/mnt/data/pihole/etc-dnsmasq.d"
 
 ---
 apiVersion: v1

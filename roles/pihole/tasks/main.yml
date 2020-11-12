@@ -12,14 +12,29 @@
     src: templates/resolv.conf.j2
     dest: /etc/resolv.conf
     mode: "0644"
-    
+
 - name: Add pihole script
   template:
     src: templates/pihole.sh.j2
     dest: /usr/local/bin/pihole.sh
+    owner: root
     group: homeserver
     mode: "0554"
+
+- name: Add pihole_stop script
+  copy:
+    src: files/pihole_stop.sh
+    dest: /usr/local/bin/pihole_stop.sh
+    owner: root
+    group: homeserver
+    mode: "0554"
+    
+
+- name: stopping possible running container
+  command: pihole_stop.sh
+  ignore_errors: yes
 
 - name: Execute script and start the server
   shell: pihole.sh
 
+  

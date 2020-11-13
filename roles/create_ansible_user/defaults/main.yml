@@ -1,4 +1,4 @@
 ansible_user_groups:
-- k8s
+- microk8s
 - docker
 - data

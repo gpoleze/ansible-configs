@@ -37,4 +37,18 @@
 - name: Execute script and start the server
   shell: pihole.sh
 
-  
+#   - name: Removinf pihole password
+#   shell: echo -n "\n" | docker exec pihole bash -l -c pihole -a -p -
+
+# - name: add container to inventory
+#   add_host:
+#     name: pihole
+#     ansible_connection: docker
+#   changed_when: false
+
+# - name: run command in container
+#   delegate_to: pihole
+#   raw: bash
+#   command: ls
+#     cmd: pihole -a -p
+#     stdin: "{{ pihole_password }}"

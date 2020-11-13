@@ -1,0 +1,4 @@
+ansible_user_groups:
+- k8s
+- docker
+- data

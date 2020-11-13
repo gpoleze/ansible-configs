@@ -1,11 +1,14 @@
+- name: Create Groups
+  group:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ ansible_user_groups }}"
+
 - name: Create user and groups
   user:
     name: ansible
     group: adm
-    groups: 
-    - microk8s
-    - docker
-    - data
+    groups: "{{ ansible_user_groups }}"
     shell: /bin/bash
 
 - name: Add ansible user to the sudoers

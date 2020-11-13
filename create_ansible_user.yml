@@ -1,6 +1,6 @@
 ---
-- hosts: homeserver
-  remote_user: homeserver
+- hosts: all
+  remote_user: gabriel
   become: true
   
   roles:

@@ -1,7 +1,6 @@
 ---
-- hosts: homeserver
+- hosts: alpha
   remote_user: ansible
-  become: true
   
   roles:
     - microk8s_setup

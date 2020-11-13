@@ -19,7 +19,7 @@
   user:
     name: time-machine
     group: time-machine
-    password: ""
+    password: "{{ time_machine_passsword }}"
   become: true
 
 - name: Create "{{ mount_path }}" directory

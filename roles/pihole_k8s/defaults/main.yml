@@ -1,0 +1,13 @@
+dns_provider: cloudflare
+dns_providers:
+  cloudflare: 1.1.1.1
+  google: 8.8.8.8
+
+pihole_base: "/mnt/data/pihole"
+
+container:
+  cpu: 0.2
+  memory: 128M
+  memory_swap: 128M
+
+stand_up_retries: 60

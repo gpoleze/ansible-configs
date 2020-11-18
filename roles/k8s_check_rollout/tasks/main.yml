@@ -1,0 +1,19 @@
+
+- name: rollback if deploy failed
+  command: >-
+    kubectl rollout status deployment/{{ k8_deployment_name }}  --namespace {{ k8_namespace }} --watch=false
+  register: deployment_rollout_status
+  retries: 5
+  delay: 1
+  until: '"successfully rolled out" in deployment_rollout_status.stdout'
+  failed_when: deployment_rollout_status.rc is undefined
+
+- name: Rollback service if deployment failed
+  command: >
+    kubectl rollout undo deployment/{{ k8_deployment_name }} --namespace {{ k8_namespace }}
+  when: not("successfully rolled out" in deployment_rollout_status.stdout)
+
+- name: Mark job as failed if service needed rollback
+  fail:
+    msg: "{{ k8_deployment_name }} update failed to rollout and a rollback to the previous version has been issued."
+  when: not("successfully rolled out" in deployment_rollout_status.stdout)

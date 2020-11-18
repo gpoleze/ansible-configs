@@ -11,8 +11,7 @@ samba_password:
   gisele: "{{ vault_samba_password.gisele }}"
 
 # Pihole
-# pihole_web_password: "{{ vault_pihole_web_password }}"
-pihole_web_password: "vault_pihole_web_password"
+pihole_web_password: "{{ vault_pihole_web_password }}"
 
 # Time Machine
 time_machine_passsword: "{{ vault_time_machine_passsword }}"

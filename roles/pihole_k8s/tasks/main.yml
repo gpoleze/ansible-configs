@@ -1,0 +1,23 @@
+- name: Template the K8S config files
+  template:
+    src: "templates/{{ item }}.yml.j2"
+    dest: "./{{ item }}.yml"
+  with_items: 
+  - namespace
+  - volumes
+  - pihole
+
+- name: deploy items
+  command: >-
+    kubectl apply -f {{ item }}.yml
+  with_items:
+  - namespace
+  - volumes
+  - pihole
+
+- name: Check rollout
+  include_role: 
+    name: k8s_check_rollout
+  vars:
+    k8_deployment_name: pihole
+    k8_namespace: network-services

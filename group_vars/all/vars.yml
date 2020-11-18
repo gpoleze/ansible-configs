@@ -5,13 +5,5 @@ user_ansible_keys:
   public: "{{ vault_user_ansible_keys.public }}"
   private_key: "{{ vault_user_ansible_keys.private_key }}"
 
-# Samba Configuration
-samba_password: 
-  gabriel: "{{ vault_samba_password.gabriel }}"
-  gisele: "{{ vault_samba_password.gisele }}"
-
 # Pihole
 pihole_web_password: "{{ vault_pihole_web_password }}"
-
-# Time Machine
-time_machine_passsword: "{{ vault_time_machine_passsword }}"

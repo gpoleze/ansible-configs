@@ -1,4 +1,6 @@
-ansible_user_groups:
+ansible_user_name: ansible
+
+ansible_user_groups: 
 - microk8s
 - docker
-- data
+- sudo

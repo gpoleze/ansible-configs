@@ -1,0 +1,93 @@
+# https://phoenixnap.com/kb/how-to-install-kubernetes-on-a-bare-metal-server
+
+- name: Update Linux
+  apt: 
+    update_cache: "yes"
+
+- name: Upgrade Linux
+  apt: 
+    upgrade: "yes"
+
+- name: Disable swap
+  command: swapoff -a
+
+- name: Resolve nftables Backend Compatibility Issue
+  command: >-
+    update-alternatives --set {{ item }} /usr/sbin/{{ item }}-legacy
+  with_items:
+  - iptables
+  - ip6tables
+  - arptables
+  - ebtables
+  ignore_errors: true
+
+- name: Install ufw
+  apt:
+    name: ufw
+    state: present
+
+- name: Configure Firewall
+  ufw: 
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  loop:
+  - 6443
+  - 2379
+  - 2380
+  - 10250
+  - 10251
+  - 10252
+  - 10255
+
+- name: Configure Firewall
+  ufw: 
+    state: reloaded
+
+- name: Install required packages
+  apt:
+    name: "{{ item }}"
+  loop:
+  - apt-transport-https 
+  - ca-certificates 
+  - curl 
+  - software-properties-common
+  
+- name: Add Docker key
+  apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+    state: present
+
+- name: Get lsb_release
+  command: lsb_release -cs
+  register: lsb_release_result
+
+- name: Add Docker Repository
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/debian {{ lsb_release_result.stdout }} stable"
+    state: present
+
+- name: Install Docker
+  apt:
+    name: docker-ce
+    state: present
+    update_cache: yes
+
+- name: check docker installation
+  command: docker run hello-world
+  register: docker_hello_world
+  failed_when: "'Hello from Docker!' not in docker_hello_world.stdout"
+
+- name: Remove Hello World image
+  shell: docker container prune -f && docker rmi hello-world
+
+- name: Change the cgroup-driver
+  copy:
+    src: files/daemon.json
+    dest: /etc/docker/daemon.json
+
+- name: reload daemons
+  systemd:
+    name: docker
+    state: restarted
+    daemon_reload: yes

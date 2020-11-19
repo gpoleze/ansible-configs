@@ -1,0 +1,9 @@
+- hosts: alpha
+  become: true
+
+  vars: 
+    ansible_user_name: ansible
+
+  roles:
+    - create_ansible_user
+    - k8s_setup

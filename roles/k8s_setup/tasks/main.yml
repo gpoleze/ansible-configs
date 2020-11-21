@@ -1,4 +1,4 @@
-# https://phoenixnap.com/kb/how-to-install-kubernetes-on-a-bare-metal-server
+## https://phoenixnap.com/kb/how-to-install-kubernetes-on-a-bare-metal-server
 
 - name: Update Linux
   apt: 
@@ -91,3 +91,72 @@
     name: docker
     state: restarted
     daemon_reload: yes
+
+## Actual Kubernetes installation
+- name: Add kubernetes key
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+
+- name: Add kubernetes Repository
+  apt_repository:
+    repo: "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+    state: present
+
+- name: Install kubelet, kubeadm and kubectl
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  loop:
+  - kubelet
+  - kubeadm 
+  - kubectl
+
+- name: Hold kubeadm
+  dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  loop:
+  - kubelet
+  - kubeadm 
+  - kubectl
+
+- name: Check if Kubernetes is already initialized
+  stat:
+    path: /etc/kubernetes/admin.conf
+  register: kubernetes_admin_conf_file
+
+- name: Initialize Kubernetes on Master Node
+  command: "kubeadm init --pod-network-cidr=10.244.0.0/16"
+  register: master_node_init_result
+  when: host_is_master and not kubernetes_admin_conf_file.stat.exists
+
+- name: Create 
+  when: host_is_master
+  file:
+    name: /home/ansible/.kube
+    state: directory
+
+- name: Copy kube config
+  when: host_is_master
+  copy:
+    remote_src: yes
+    src: /etc/kubernetes/admin.conf
+    dest: /home/ansible/.kube/config
+    owner: ansible
+    group: ansible
+    mode: 0775
+
+- name: Install Pod Network Add-On (Flannel)
+  when: host_is_master
+  shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml --kubeconfig /etc/kubernetes/admin.conf
+
+- name: Get Kubernetes Join Command
+  when: not host_is_master
+  command: kubeadm token create --print-join-command
+  register: k8s_join_command
+
+- name: Join Worker Node to Cluster
+  when: not host_is_master
+  command: "{{ k8s_join_command.stdout }}"

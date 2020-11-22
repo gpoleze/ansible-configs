@@ -7,3 +7,12 @@ user_ansible_keys:
 
 # Pihole
 pihole_web_password: "{{ vault_pihole_web_password }}"
+
+# Time Machine
+time_machine_passsword: "{{ vault_time_machine_passsword }}"
+
+## MicroK8s Cluster
+microk8s_cluster:
+  certificate_authority_data: "{{ vault_microk8s_cluster.certificate_authority_data }}"
+  token: "{{ vault_microk8s_cluster.token }}"
+  ip: 192.169.0.160

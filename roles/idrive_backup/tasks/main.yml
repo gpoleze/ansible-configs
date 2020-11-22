@@ -1,0 +1,16 @@
+- name: iDrive Setup
+  block:
+  - name: Get kubeconfig file
+    template:
+      src: templates/kubeconfig.j2
+      dest: k8s-kubeconfig.yml
+
+
+
+  always:
+  - name: Cleanup
+    file:
+      path: "{{ item }}"
+      state: absent
+    loop:
+    - k8s-kubeconfig.yml

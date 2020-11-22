@@ -1,0 +1,3 @@
+k8s_certificate_authority_data: "{{ microk8s_cluster.certificate_authority_data }}"
+k8s_token: "{{ microk8s_cluster.token }}"
+k8s_cluster_ip: "{{ microk8s_cluster.ip }}"

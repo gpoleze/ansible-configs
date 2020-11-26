@@ -132,6 +132,10 @@
   register: master_node_init_result
   when: host_is_master and not kubernetes_admin_conf_file.stat.exists
 
+- name: Untaint master node
+  command: kubectl taint nodes --all node-role.kubernetes.io/master-
+  when: host_is_master and untaint_master_node
+
 - name: Create 
   when: host_is_master
   file:

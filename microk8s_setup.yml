@@ -1,6 +1,9 @@
 ---
-- hosts: alpha
+- hosts: k8s-master
   remote_user: ansible
   
   roles:
     - microk8s_setup
+    - include_role:
+      name: metallb_setup
+      when: add_bare_metal_load_balancer

@@ -1,0 +1,26 @@
+---
+- name: Get latest release of a public repository
+  github_release:
+    user: metallb
+    repo: metallb
+    action: latest_release
+  register: metallb_latest_release
+
+- name: Deploy metallb namespace
+  command: "kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/{{ metallb_latest_release.tag }}/manifests/namespace.yaml"
+  register: metallb_namespace_deploy
+  changed_when: "'configured' in metallb_namespace_deploy.stdout"
+
+- name: Deploy metallb
+  command: "kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/{{ metallb_latest_release.tag }}/manifests/metallb.yaml"
+  register: metallb_deploy
+  changed_when: "'configured' in metallb_deploy.stdout"
+
+- name: Check rollout
+  include_role:
+    name: k8s_check_rollout
+  vars:
+    k8_deployment_name: controller
+    k8_namespace: metallb-system
+    retries: 20
+    delay: 3

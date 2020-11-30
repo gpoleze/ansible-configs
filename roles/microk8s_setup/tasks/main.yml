@@ -11,6 +11,8 @@
   command: microk8s status --wait-ready
   register: wait_result
   failed_when: "'microk8s is running' not in wait_result.stdout"
+  retries: 20
+  delay: 3
   become: true
 
 - name: add kubectl alias
@@ -69,3 +71,7 @@
   file: 
     name: /tmp/hostpath_provisioner_new_deploy.yml
     state: absent
+
+- name: Add MetalLb
+  when: add_bare_metal_load_balancer
+  include_tasks: metallb.yml

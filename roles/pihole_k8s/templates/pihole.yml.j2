@@ -32,6 +32,22 @@ spec:
       - name: pihole-container
         image: pihole/pihole:latest
         imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "128M"
+          limits:
+            cpu: "750m"
+            memory: "512M"
+        ports:
+        - name: liveness-port
+          containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /admin
+            port: liveness-port
+          initialDelaySeconds: 5
+          periodSeconds: 5
         env:
         - name: TZ
           value: America/Vancouver

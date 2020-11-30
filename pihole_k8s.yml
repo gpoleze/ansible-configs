@@ -1,14 +1,13 @@
 ---
 - hosts: localhost
-  
-  tasks: 
+  tasks:
   - name: Deploy pihole
     block:
     - include_role:
         name: pihole_k8s
 
     always:
-    - name: Cleanup template files  
+    - name: Cleanup template files
       file:
         path: "{{ item }}"
         state: absent

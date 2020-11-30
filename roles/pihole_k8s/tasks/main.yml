@@ -2,7 +2,8 @@
   template:
     src: "templates/{{ item }}.yml.j2"
     dest: "./{{ item }}.yml"
-  with_items: 
+    mode: "0444"
+  with_items:
   - namespace
   - volumes
   - pihole
@@ -10,13 +11,15 @@
 - name: deploy items
   command: >-
     kubectl apply -f {{ item }}.yml
+  changed_when: "'configured' in deploy_output.stdout"
+  register: deploy_output
   with_items:
   - namespace
   - volumes
   - pihole
 
 - name: Check rollout
-  include_role: 
+  include_role:
     name: k8s_check_rollout
   vars:
     k8_deployment_name: pihole

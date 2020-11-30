@@ -80,7 +80,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: pihole
+  name: pihole-service
   namespace: network-services
 spec:
   selector:
@@ -99,4 +99,3 @@ spec:
     name: dns-udp
   externalIPs:
   - 192.168.0.160
-  # externalTrafficPolicy: Local

@@ -21,3 +21,5 @@
   vars:
     k8_deployment_name: pihole
     k8_namespace: network-services
+    retries: 20
+    delay: 3

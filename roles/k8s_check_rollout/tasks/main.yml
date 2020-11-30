@@ -3,8 +3,8 @@
   command: >-
     kubectl rollout status deployment/{{ k8_deployment_name }}  --namespace {{ k8_namespace }} --watch=false
   register: deployment_rollout_status
-  retries: "{{ no_retriess | default('5') }}"
-  delay: 1
+  retries: "{{ retries | default('5') }}"
+  delay: "{{ delay | default('1') }}"
   until: '"successfully rolled out" in deployment_rollout_status.stdout'
   failed_when: deployment_rollout_status.rc is undefined
 

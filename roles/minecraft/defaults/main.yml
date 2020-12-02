@@ -1,0 +1,19 @@
+namespace: applications
+
+## Server Properties 
+# keys from https://hub.docker.com/r/itzg/minecraft-bedrock-server
+# values from https://minecraft.gamepedia.com/Server.properties#Bedrock_Edition_3
+server_properties:
+  SERVER_NAME: Home Edition
+  EULA: "TRUE"
+  LEVEL_NAME: home_edition
+  VERSION: "latest"
+  GAMEMODE: "survival"
+  DIFFICULTY: "easy"
+  ALLOW_CHEATS: "true"
+
+## Docker Image
+minecraft_image:
+  name: itzg/minecraft-bedrock-server
+  version: latest
+

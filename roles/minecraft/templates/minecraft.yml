@@ -1,0 +1,77 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minecraft
+  labels:
+    app: minecraft
+    namespace: applications
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels: 
+      app: minecraft
+  template:
+    metadata:
+      name: minecraft-pod
+      labels:
+        app: minecraft
+    spec:
+      containers:
+      - name: minecraft-container
+        image: itzg/minecraft-bedrock-server
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "128M"
+          limits:
+            cpu: "750m"
+            memory: "1G"
+        ports:
+          - name: server-port
+            containerPort: 19132
+            protocol: UDP
+        readinessProbe: &probe
+          exec:
+            command:
+            - mc-monitor
+            - status-bedrock
+            - --host
+            - 127.0.0.1
+          initialDelaySeconds: 30
+        livenessProbe: *probe
+        env:
+        - name: SERVER_NAME
+          value: "Home Edition"
+        - name: VERSION
+          value: "latest"
+        - name: GAMEMODE
+          value: "survival"
+        - name: DIFFICULTY
+          value: "easy"
+        - name: LEVEL_NAME
+          value: home_edition
+        - name: EULA
+          value: "TRUE"
+        - name: ALLOW_CHEATS
+          value: "true"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minecraft-service
+  namespace: applications
+  annotations:
+    metallb.universe.tf/address-pool: microk8s-ip-space
+spec:
+  selector:
+    app: minecraft
+  type: LoadBalancer
+  ports:
+  - name: base-port
+    port: 19132
+    targetPort: 19132
+    protocol: UDP
+  externalTrafficPolicy: Local

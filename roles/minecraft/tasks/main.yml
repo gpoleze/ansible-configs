@@ -1,0 +1,41 @@
+---
+- name: Configure and Deploy Minecraft server
+  block:
+    - name: Create tmp dir
+      file:
+        path: tmp
+        state: directory
+
+    - name: template manifests
+      template:
+        src: "templates/{{ item }}.yml.j2"
+        dest: "tmp/{{ item }}.yml"
+      loop:
+      - namespace
+      - deployment
+      - service
+
+    - name: Deploy resources
+      command: >-
+        kubectl apply -f tmp/{{ item }}.yml
+      register: deploy_resources_output
+      changed_when: "'configured' in deploy_resources_output.stdout or 'created' in deploy_resources_output.stdout"
+      loop:
+        - namespace
+        - deployment
+        - service
+
+    - name: Check rollout
+      include_role:
+        name: k8s_check_rollout
+      vars:
+        k8_deployment_name: minecraft
+        k8_namespace: "{{ namespace }}"
+        retries: 20
+        delay: 3
+
+  always:
+  - name: Clean up
+    file:
+      path: tmp
+      state: absent

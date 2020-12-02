@@ -5,7 +5,7 @@ metadata:
   name: minecraft
   labels:
     app: minecraft
-    namespace: applications
+    namespace: {{ namespace }}
 spec:
   replicas: 1
   revisionHistoryLimit: 5
@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: minecraft-container
-        image: itzg/minecraft-bedrock-server
+        image: {{ minecraft_image.name }}:{{ minecraft_image.version }}
         imagePullPolicy: Always
         resources:
           requests:
@@ -40,38 +40,9 @@ spec:
             - status-bedrock
             - --host
             - 127.0.0.1
-          initialDelaySeconds: 30
+          initialDelaySeconds: 60
         livenessProbe: *probe
         env:
-        - name: SERVER_NAME
-          value: "Home Edition"
-        - name: VERSION
-          value: "latest"
-        - name: GAMEMODE
-          value: "survival"
-        - name: DIFFICULTY
-          value: "easy"
-        - name: LEVEL_NAME
-          value: home_edition
-        - name: EULA
-          value: "TRUE"
-        - name: ALLOW_CHEATS
-          value: "true"
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: minecraft-service
-  namespace: applications
-  annotations:
-    metallb.universe.tf/address-pool: microk8s-ip-space
-spec:
-  selector:
-    app: minecraft
-  type: LoadBalancer
-  ports:
-  - name: base-port
-    port: 19132
-    targetPort: 19132
-    protocol: UDP
-  externalTrafficPolicy: Local
+        {% for key, value in server_properties.items() %}- name: {{ key }}
+          value: "{{ value }}"
+        {% endfor %}

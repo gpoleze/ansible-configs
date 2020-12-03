@@ -18,7 +18,7 @@
 
     - name: Deploy resources
       command: >-
-        kubectl apply -f tmp/{{ item }}.yml
+        kubectl apply -f tmp/{{ item }}.yml --record
       register: deploy_resources_output
       changed_when: "'configured' in deploy_resources_output.stdout or 'created' in deploy_resources_output.stdout"
       loop:
@@ -33,11 +33,11 @@
       vars:
         k8_deployment_name: minecraft
         k8_namespace: "{{ namespace }}"
-        retries: 20
-        delay: 3
+        retries: 30
+        delay: 6
 
-  # always:
-  # - name: Clean up
-  #   file:
-  #     path: tmp
-  #     state: absent
+  always:
+  - name: Clean up
+    file:
+      path: tmp
+      state: absent

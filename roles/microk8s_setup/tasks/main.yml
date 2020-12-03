@@ -58,6 +58,11 @@
   retries: 5
   until: "'Started.' in cmd_res.stdout"
 
+- name: Adding NFS package
+  apt:
+    name: nfs-kernel-serve
+    state: present
+
 - name: create .kube folder
   file:
     path: ~/.kube

@@ -18,6 +18,10 @@ spec:
       labels:
         app: minecraft
     spec:
+      volumes:
+      - name: minecraft-data-volume 
+        persistentVolumeClaim:
+          claimName: minecraft-pvc
       containers:
       - name: minecraft-container
         image: {{ minecraft_image.name }}:{{ minecraft_image.version }}
@@ -42,7 +46,11 @@ spec:
             - 127.0.0.1
           initialDelaySeconds: 60
         livenessProbe: *probe
+        volumeMounts:
+        - name: minecraft-data-volume
+          mountPath: /data
         env:
         {% for key, value in server_properties.items() %}- name: {{ key }}
           value: "{{ value }}"
         {% endfor %}
+      

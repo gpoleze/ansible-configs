@@ -14,6 +14,7 @@
       - namespace
       - deployment
       - service
+      - volumes
 
     - name: Deploy resources
       command: >-
@@ -24,6 +25,7 @@
         - namespace
         - deployment
         - service
+        - volumes
 
     - name: Check rollout
       include_role:
@@ -34,8 +36,8 @@
         retries: 20
         delay: 3
 
-  always:
-  - name: Clean up
-    file:
-      path: tmp
-      state: absent
+  # always:
+  # - name: Clean up
+  #   file:
+  #     path: tmp
+  #     state: absent

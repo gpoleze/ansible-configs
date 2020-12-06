@@ -57,6 +57,13 @@ spec:
       labels:
         app: idrive
     spec:
+      initContainers:
+        - name: copy-idrive-script-files
+          image: gpoleze/idrive:latest
+          command: ["/bin/sh", "-c", "cp -r /opt/idrive/ /data/scripts"]
+          volumeMounts:
+          - name: config-persistence-volume
+            mountPath: /data
       containers:
       - name: idrive-container
         image: gpoleze/idrive:latest
@@ -72,7 +79,7 @@ spec:
         volumeMounts:
         # Persistence Volume
         - name: config-persistence-volume
-          mountPath: /opt/idrive/Idrivelib
+          mountPath: /data
         # Volumes to be backed up
         - name: arquivos-volume
           mountPath: /mnt/backup/arquivos
@@ -82,7 +89,6 @@ spec:
           mountPath: /mnt/backup/time-machine/gabriel
         - name: time-machine-gisele
           mountPath: /mnt/backup/time-machine/gisele
-
       volumes:
       # Persistence Volume
       - name: config-persistence-volume

@@ -1,0 +1,109 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-pv-idrive
+  namespace: applications
+  labels:
+    location: truenas
+    size: 8Gi
+spec:
+  capacity:
+    storage: 8Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs
+  mountOptions:
+    - hard
+    - nfsvers=3
+  nfs:
+    server: 192.168.0.225
+    path: "/mnt/storage0/k8svolumes/idrive"
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: idrive-pvc
+  namespace: applications
+  labels:
+    app: idrive
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs
+  resources:
+    requests:
+      storage: 8Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: idrive
+  labels:
+    app: idrive
+  namespace: applications
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels: 
+      app: idrive
+  template:
+    metadata:
+      name: idrive-pod
+      labels:
+        app: idrive
+    spec:
+      containers:
+      - name: idrive-container
+        image: gpoleze/idrive:latest
+        imagePullPolicy: Always
+        tty: true
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "128M"
+          limits:
+            cpu: "750m"
+            memory: "512M"
+        volumeMounts:
+        # Persistence Volume
+        - name: config-persistence-volume
+          mountPath: /opt/idrive/Idrivelib
+        # Volumes to be backed up
+        - name: arquivos-volume
+          mountPath: /mnt/backup/arquivos
+        - name: k8s-volume
+          mountPath: /mnt/backup/k8svolumes
+        - name: time-machine-gabriel
+          mountPath: /mnt/backup/time-machine/gabriel
+        - name: time-machine-gisele
+          mountPath: /mnt/backup/time-machine/gisele
+
+      volumes:
+      # Persistence Volume
+      - name: config-persistence-volume
+        persistentVolumeClaim:
+          claimName: idrive-pvc
+      
+      # Volumes to be backed up
+      - name: arquivos-volume
+        nfs:  
+          server: 192.168.0.225
+          path: /mnt/storage0/arquivos
+      - name: k8s-volume
+        nfs:  
+          server: 192.168.0.225
+          path: /mnt/storage0/k8svolumes
+      - name: time-machine-gabriel
+        nfs:  
+          server: 192.168.0.225
+          path: /mnt/storage0/time-machine/gabriel
+      - name: time-machine-gisele
+        nfs:  
+          server: 192.168.0.225
+          path: /mnt/storage0/time-machine/gisele
+

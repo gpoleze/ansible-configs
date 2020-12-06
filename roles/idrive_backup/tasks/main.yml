@@ -3,14 +3,12 @@
   - name: Get kubeconfig file
     template:
       src: templates/kubeconfig.j2
-      dest: k8s-kubeconfig.yml
+      dest: tmp/k8s-kubeconfig.yml
 
-
+- name: Deploy 
   
   always:
   - name: Cleanup
     file:
-      path: "{{ item }}"
+      path: tmp
       state: absent
-    loop:
-    - k8s-kubeconfig.yml

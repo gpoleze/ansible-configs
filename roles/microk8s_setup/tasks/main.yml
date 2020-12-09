@@ -20,48 +20,61 @@
   become: true
 
 - name: enabling microk8s modules
-  command: "microk8s enable {{ item }}"
+  command: >-
+    /snap/bin/microk8s enable {{ item }}
+  changed_when: "'Enabling' in enabling_results.stdout"
+  register: enabling_results
   with_items:
   - dns
   - ingress 
   - storage
 
-# Configuring Storage
+# Configuring Local Storage
 - name: get local hostpath-provisioner deploy in kube-system
-  command: microk8s kubectl get -o yaml -n kube-system deploy hostpath-provisioner
+  command: /snap/bin/microk8s kubectl get -o yaml -n kube-system deploy hostpath-provisioner
   register: hostpath_provisioner
+  when: configure_local_storage
+
+- name: Creating tmp folder
+  file:
+    name: tmp
+    state: directory
 
 - name: write hostpath_provisioner new deploy file
   copy:
     content: "{{ new_deploy }} "
-    dest: /tmp/hostpath_provisioner_new_deploy.yml
+    dest: tmp/hostpath_provisioner_new_deploy.yml
   vars:
     old_path: /var/snap/microk8s/common/default-storage
     new_path: /data/snap/microk8s/common/default-storage
     new_deploy: "{{ hostpath_provisioner.stdout | replace(old_path, new_path) }}"
   become: true
+  when: configure_local_storage
 
 - name: apply hostpath_provisioner
-  command: 
-    cmd: kubectl apply -f hostpath_provisioner_new_deploy.yml
-    chdir: /tmp
+  command: /snap/bin/microk8s kubectl apply -f tmp/hostpath_provisioner_new_deploy.yml
+  when: configure_local_storage
 
 - name: stopping microk8s
-  command: microk8s stop
+  command: /snap/bin/microk8s stop
   register: cmd_res
   retries: 5
   until: "'Stopped.' in cmd_res.stdout"
+  when: configure_local_storage
 
 - name: restart microk8s
-  command: microk8s start
+  command: /snap/bin/microk8s start
   register: cmd_res
   retries: 5
   until: "'Started.' in cmd_res.stdout"
+  when: configure_local_storage
 
+# Configuring NFS Storage
 - name: Adding NFS package
   apt:
-    name: nfs-kernel-serve
+    name: nfs-common
     state: present
+  become: true
 
 - name: create .kube folder
   file:
@@ -70,13 +83,9 @@
 
 - name: generate kubeconfig
   shell: >-
-    microk8s kubectl config view --raw > $HOME/.kube/config
+    /snap/bin/microk8s kubectl config view --raw > $HOME/.kube/config
 
 - name: Cleanup
   file: 
-    name: /tmp/hostpath_provisioner_new_deploy.yml
+    name: tmp
     state: absent
-
-- name: Add MetalLb
-  when: add_bare_metal_load_balancer
-  include_tasks: metallb.yml

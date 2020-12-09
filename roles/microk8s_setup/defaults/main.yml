@@ -1,0 +1,2 @@
+configure_local_storage: false
+add_bare_metal_load_balancer: false

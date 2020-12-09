@@ -1,5 +1,7 @@
 ---
-- hosts: k8s-master
+- hosts: 
+  - k8s-master
+  - microk8s-cluster-node-01
   remote_user: ansible
   
   roles:

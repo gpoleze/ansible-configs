@@ -9,9 +9,5 @@
     always:
     - name: Cleanup template files
       file:
-        path: "{{ item }}"
+        path: "tmp"
         state: absent
-      with_items:
-        - namespace.yml
-        - volumes.yml
-        - pihole.yml

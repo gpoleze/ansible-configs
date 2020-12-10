@@ -1,7 +1,12 @@
+- name: Creat tmp folder
+  file:
+    name: tmp
+    state: directory
+
 - name: Template the K8S config files
   template:
     src: "templates/{{ item }}.yml.j2"
-    dest: "./{{ item }}.yml"
+    dest: "tmp/{{ item }}.yml"
     mode: "0444"
   with_items:
   - namespace
@@ -10,7 +15,7 @@
 
 - name: deploy items
   command: >-
-    kubectl apply -f {{ item }}.yml
+    kubectl apply -f tmp/{{ item }}.yml --record
   changed_when: "'configured' in deploy_output.stdout"
   register: deploy_output
   with_items:
@@ -24,5 +29,5 @@
   vars:
     k8_deployment_name: pihole
     k8_namespace: network-services
-    retries: 20
-    delay: 3
+    retries: 30
+    delay: 10

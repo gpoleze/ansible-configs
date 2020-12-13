@@ -5,6 +5,7 @@
     repo: metallb
     action: latest_release
   register: metallb_latest_release
+  delegate_to: localhost
 
 - name: Deploy metallb namespace
   command: "kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/{{ metallb_latest_release.tag }}/manifests/namespace.yaml"

@@ -1,0 +1,4 @@
+# apt update
+# apt upgrade
+# sudo dpkg-reconfigure --priority low unattended-upgrades
+# timedatectl set-timezone America/Vancouver

@@ -1,1 +1,29 @@
+# These files are text and should be normalized (convert crlf => lf)
+*.txt   text    eol=lf
+*.yaml  text    eol=lf
+*.yml   text    eol=lf
+*.json  text    eol=lf
+*.tsx   text    eol=lf
+*.ts    text    eol=lf
+*.jsx   text    eol=lf
+*.js    text    eol=lf
+*.md    text    eol=lf
+*.j2    text    eol=lf
+*.py    text    eol=lf
+*.sh    text    eol=lf
+
+# These files are text but should NOT be normalized (do not convert crlf/lf)
+*.bat   -text
+
+# Images should be treated as binary
+# (binary is a macro for -text -diff)
+*.png   binary
+*.jpeg  binary
+*.jpg   binary
+*.svg   binary
+
+# Let git determine if the file is a text or a binary, if it's text normalize it (convert crlf => lf)
+*       text=auto   eol=lf
+
+# Allowing Git to check differences in the vault
 group_vars/all/vault.yml diff=ansible-vault merge=binary

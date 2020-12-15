@@ -60,7 +60,6 @@ spec:
           value: "1.1.1.1"
         - name: DNS2
           value: "1.0.0.1"
-          value: "192.168.0.150"
         volumeMounts:
         - mountPath: /etc/pihole/
           name: pihole-volume
@@ -88,7 +87,7 @@ spec:
   selector:
     app: pihole
   type: LoadBalancer
-  loadBalancerIP: 192.168.0.150
+  loadBalancerIP: {{ load_balancer_ip }}
   ports:
   - port: 80
     targetPort: 80
@@ -112,7 +111,7 @@ spec:
   selector:
     app: pihole
   type: LoadBalancer
-  loadBalancerIP: 192.168.0.150
+  loadBalancerIP: {{ load_balancer_ip }}
   ports:
   - port: 53
     targetPort: 53

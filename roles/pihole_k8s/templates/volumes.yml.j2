@@ -15,7 +15,7 @@ spec:
     - ReadWriteMany
   mountOptions:
     - hard
-    - nfsvers=3
+    - nfsvers=4
   nfs:
     server: {{ nfs_server_ip }}
     path: "{{ nfs_mount_path }}/etc-pihole"
@@ -37,7 +37,7 @@ spec:
     - ReadWriteMany
   mountOptions:
     - hard
-    - nfsvers=3
+    - nfsvers=4
   nfs:
     server: {{ nfs_server_ip }}
     path: "{{ nfs_mount_path }}/etc-dnsmasq.d"

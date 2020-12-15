@@ -1,1 +1,1 @@
-metallb_addresses: 192.168.0.64/26
+metallb_addresses: "192.168.0.80-192.168.0.127"

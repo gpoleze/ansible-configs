@@ -4,3 +4,4 @@ mickrok8s_add_ons:
   - dns
   - ingress 
   - dashboard
+  - storage

@@ -3,9 +3,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: minecraft
+  namespace: {{ namespace }}
   labels:
     app: minecraft
-    namespace: {{ namespace }}
 spec:
   replicas: 1
   revisionHistoryLimit: 5

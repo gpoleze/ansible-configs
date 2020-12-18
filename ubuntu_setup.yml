@@ -1,0 +1,5 @@
+- hosts: "{{ target_host }}"
+  ansible_user: gabriel
+  roles:
+    - basic_ubuntu_config
+    # - create_ansible_user

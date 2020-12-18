@@ -1,9 +1,9 @@
-# new user
-# sudo useradd -m -G sudo gabriel
+## Some manual steps (at least for now)
+# sudo useradd -m -G sudo -s /bin/bash gabriel
 # sudo passwd gabriel
 # su gabriel
 # mkdir .ssh
-# echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC90Tw4LHZmufY2RgikX9D3KFgrEfkGAvnTSn50m+XImE3tP8i30q7eKpgnUDo6fOG7n0heN8NnVk06J8iok2d3unVDzD6slk1upx/DU9A8No6r/VmEHQ9Nh/YUFlVQMIeHB4BqjedBE3OdQIx8lanS8kZ4Kl8PiOFrPxwYMFtIUXjA7aFB51FsRTe1zxdiSjghZA0hjpcKRQWa+P+XLurvQ+hJ+0Zcq4vOrsmeHK2U1tDs63uG/SxCZIljW1LSReGrj2OO9huKA58roogFU34x49ldBPeWrWp69pjKrxtxixiqtozwpccmi8uvkH8d0W33L2+wc4o1+v1VeNKZdn1xVK5AGYEDZQLI0Ob9iCDz4Q7q9LL/qrubKSGTeMvzsEcwaa/ImYMZh7zNshgvfVI5ZH9FEV6wfrVr5DlTgqmkuvYoV3ezHQO9bHpLI6AaWRtVaq5q7bF6cV7Mif+l6yXAikdylNg96aRovW27QW7B9K38ZFJIboQwi8kc0iHTWqqDmwEczjfHPhA07qiM2vVYodyi5zAXuGxImTe6oPoGQzWyB2g9qj+e9z5eR5kX5cmA6MVLIY1/gTDZPZrDdtUcJwCL+suR0YUW5isq+hQNXlcFfm0TmiJUhGn23BHlCTUUbZmrploqiifeTAx0yKGucYUB9DinPv6FMFI1vYALaw== gabriel.poleze@gmail.com" > .ssh/authorized_hosts
+# echo "" > .ssh/authorized_hosts
 # sudo vi /etc/ssh/sshd_config 
 
 - name: Update Ubuntu
@@ -12,5 +12,15 @@
     upgrade: dist
   become: true
 
-# sudo dpkg-reconfigure --priority low unattended-upgrades
-# timedatectl set-timezone America/Vancouver
+- name: Coonfiguring auto updates
+  command: dpkg-reconfigure --priority low unattended-upgrades -f noninteractive
+  become: true
+
+- name: Adjusting Timezone
+  command: timedatectl set-timezone America/Vancouver
+  become: true
+
+- name: Adjust Hostname
+  when: "hostname | default(False)"
+  command: "hostnamectl set-hostname {{ hostname }}"
+  become: true

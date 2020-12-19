@@ -1,26 +1,18 @@
-## Some manual steps (at least for now)
-# sudo useradd -m -G sudo -s /bin/bash gabriel
-# sudo passwd gabriel
-# su gabriel
-# mkdir .ssh
-# echo "" > .ssh/authorized_hosts
-# sudo vi /etc/ssh/sshd_config 
-
 - name: Update Ubuntu
   apt:
     update_cache: yes
     upgrade: dist
-  become: true
 
 - name: Coonfiguring auto updates
   command: dpkg-reconfigure --priority low unattended-upgrades -f noninteractive
-  become: true
 
 - name: Adjusting Timezone
   command: timedatectl set-timezone America/Vancouver
-  become: true
 
 - name: Adjust Hostname
   when: "hostname | default(False)"
   command: "hostnamectl set-hostname {{ hostname }}"
-  become: true
+
+- name: Reboot
+  reboot:
+    msg: Reboot process started

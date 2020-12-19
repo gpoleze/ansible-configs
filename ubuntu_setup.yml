@@ -1,6 +1,10 @@
 ---
 - hosts: "{{ target_host }}"
-  remote_user: gabriel
+  remote_user: "{{ remote_user | default('ubuntu')}}"
+  become: true
+
   roles:
-    - basic_ubuntu_config
-    - create_ansible_user
+  - ubuntu_basic_config
+  - create_ansible_user
+  - ubuntu_static_ip
+

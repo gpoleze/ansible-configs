@@ -1,0 +1,45 @@
+- name: Set facts
+  set_fact: 
+    remote_temp_folder: /opt/jenkins-install
+
+# - name: Create temp folder
+#   file:
+#     path: "{{ remote_temp_folder }}"
+#     state: directory
+#     mode: '0777'
+
+- name: Copy Jenkins' files to remote
+  copy:
+    src: files
+    dest: "{{ remote_temp_folder }}"
+    directory_mode: 'yes'
+    mode: '0777'
+
+# - name: Adding required K8S objects
+#   shell: >-
+#     kubectl apply -f {{ remote_temp_folder }}/files/{{ item }}.yml
+#   register: object_output
+#   changed_when: "'configured' in object_output.stdout or 'created' in object_output.stdout"
+#   with_items:
+#   - namespace
+#   - volumes
+#   - service
+
+# - name: Add stable jenkins repo
+#   community.kubernetes.helm_repository:
+#     name: jenkinsci
+#     repo_url: "https://charts.jenkins.io"
+
+- name: Install Jenkins
+  command: >- 
+    helm install jenkins -n jenkins -f {{ remote_temp_folder }}/files/values.yml "jenkinsci/jenkins" --kubeconfig ~/.kube/config
+  become: true
+
+
+- name: Echo admin password
+  command: kubectl exec --namespace jenkins -it svc/jenkins -c jenkins -- /bin/cat /run/secrets/chart-admin-password
+
+# - name: Clean up
+#   file:
+#     path: "{{ remote_temp_folder }}"
+#     status: absent

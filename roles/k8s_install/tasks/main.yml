@@ -1,24 +1,75 @@
-- name: Install docker
-  shell: curl -sSL get.docker.com | sh
+# - name: Install docker
+#   shell: curl -sSL get.docker.com | sh
 
-- name: Add ansible user to docker group
-  user:
-    name: ansible
-    groups: 
-    - docker
-    append: yes
+# - name: Add ansible user to docker group
+#   user:
+#     name: ansible
+#     groups: 
+#     - docker
+#     append: yes
 
-- name: Set Docker daemon options
+# - name: Set Docker daemon options
+#   copy:
+#     src: files/daemon.json
+#     dest: /etc/docker/daemon.json
+
+# - name: Enable routing
+#   replace:
+#     path: /etc/sysctl.conf
+#     regexp: '#net.ipv4.ip_forward=1'
+#     replace: 'net.ipv4.ip_forward=1'
+
+# - name: Rebooting host
+#   reboot:
+#     msg: Rebooting host
+
+# - name: Check docker daemon
+#   systemd:
+#     state: started
+#     name: docker
+
+- name: Add Kubernetes repository
+  lineinfile:
+    path: /etc/apt/sources.list.d/kubernetes.list
+    line: "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+    create: true
+    state: present
+
+- name: Add the GPG key
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+
+- name: Install required Kubernetes packages
+  apt:
+    name: "{{ item }}"
+    update_cache: true
+    state: present
+  with_items:
+  - kubeadm
+  - kubectl
+  - kubelet
+
+- name: Initialize Kubernetes
+  command: >-
+    kubeadm init --pod-network-cidr={{ pod_network_cidr }}
+  when: is_master
+
+- name: Set up config directory
+  file:
+    path: ~/.kube
+    state: directory
+  when: is_master
+
+- name: Copy KubeConfig Configuration
   copy:
-    src: files/daemon.json
-    dest: /etc/docker/daemon.json
-
-- name: Enable routing
-  replace:
-    path: /etc/sysctl.conf
-    regexp: '#net.ipv4.ip_forward=1'
-    replace: 'net.ipv4.ip_forward=1'
-
-- name: Rebooting host
-  reboot:
-    msg: Rebooting host
+    src: /etc/kubernetes/admin.conf
+    dest: ~/.kube/config
+    owner: ansible
+    group: adm
+    remote_src: yes
+  when: is_master
+  
+- name: Install flannel network driver
+  command: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+  when: is_master

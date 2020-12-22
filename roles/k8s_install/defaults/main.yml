@@ -1,0 +1,2 @@
+is_master: false
+pod_network_cidr: 192.168.0.64/26

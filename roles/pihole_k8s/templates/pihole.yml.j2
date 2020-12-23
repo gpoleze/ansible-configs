@@ -44,10 +44,10 @@ spec:
           containerPort: 80
         readinessProbe:
           httpGet:
-            path: /admin
+            path: /
             port: liveness-port
-          initialDelaySeconds: 5
-          periodSeconds: 5
+          initialDelaySeconds: 60
+          periodSeconds: 10
         env:
         - name: TZ
           value: America/Vancouver

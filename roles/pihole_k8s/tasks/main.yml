@@ -16,7 +16,7 @@
 - name: deploy items
   command: >-
     kubectl apply -f tmp/{{ item }}.yml --record
-  changed_when: "'configured' in deploy_output.stdout"
+  changed_when: "'created' in deploy_output.stdout or 'configured' in deploy_output.stdout"
   register: deploy_output
   with_items:
   - namespace

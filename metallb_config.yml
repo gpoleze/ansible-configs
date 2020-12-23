@@ -1,6 +1,5 @@
 ---
-- hosts: "{{ target_host }}"
-  remote_user: ansible
+- hosts: localhost
   
   roles:
     - metallb_setup

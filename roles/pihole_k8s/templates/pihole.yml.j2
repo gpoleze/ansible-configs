@@ -17,7 +17,7 @@ metadata:
     app: pihole
   namespace: {{ namespace }}
 spec:
-  replicas: 1
+  replicas: 2
   revisionHistoryLimit: 5
   selector:
     matchLabels: 
@@ -42,11 +42,17 @@ spec:
         ports:
         - name: liveness-port
           containerPort: 80
-        readinessProbe:
+        livenessProbe:
           httpGet:
-            path: /
+            path: /admin/index.html
             port: liveness-port
           initialDelaySeconds: 60
+          periodSeconds: 10
+        startupProbe:
+          httpGet:
+            path: /admin/index.html
+            port: liveness-port
+          initialDelaySeconds: 90
           periodSeconds: 10
         env:
         - name: TZ

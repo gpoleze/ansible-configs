@@ -1,0 +1,31 @@
+- name: Initialize Kubernetes
+  command: >-
+    kubeadm init --pod-network-cidr=10.1.0.0/16
+  register: kubeadmin_init
+
+- name: Set Join command
+  set_fact: 
+    kubeadmin_join: "{{ kubeadmin_init.stdout_lines | select('match', 'kubeadm join \\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+ --token .*') | list | first }}"
+
+- name: Set up config directory
+  file:
+    path: ~/.kube
+    state: directory
+
+- name: Copy KubeConfig Configuration
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: ~/.kube/config
+    owner: ansible
+    group: adm
+    remote_src: yes
+  
+- name: Install flannel network driver
+  command: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+
+- name: Make sure all pods are up
+  command: kubectl get pods --all-namespaces -o json
+  register: pods_results
+  until: pods_results.stdout|from_json|json_query('items[*].status.phase')|unique == ["Running"]
+  retries: 20
+  delay: 5

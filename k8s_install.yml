@@ -1,7 +1,26 @@
 ---
-- hosts: "{{ target_host }}"
+# Prepare all nodes
+- hosts: k8s-cluster
   remote_user: ansible
   become: true
   
   roles:
-  - k8s_install
+  - role: k8s_install/node
+
+# Initiate Master
+- hosts: k8s-masters
+  remote_user: ansible
+  become: true
+  gather_facts: yes
+  
+  roles:
+  - role: k8s_install/master
+
+# # Join Cluster
+# - hosts: k8s-nodes
+#   remote_user: ansible
+#   gather_facts: yes
+#   become: true
+  
+#   roles:
+#   - k8s_install/join_cluster

@@ -1,5 +1,5 @@
-k8s_cluster_master_ip: 192.168.0.64
-load_balancer_ip: 192.168.0.80
+k8s_cluster_master_ip: 192.168.0.56
+load_balancer_ip: 192.168.0.64
 
 dns_provider: cloudflare
 dns_providers:

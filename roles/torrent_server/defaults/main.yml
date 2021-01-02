@@ -1,6 +1,8 @@
 namespace: applications
 nfs_server_ip: 192.168.0.225
 nfs_base_path: /mnt/storage0
+nfs_puid: 1002
+nfs_pgid: 1004
 
 resources:
   vpn:
@@ -17,3 +19,5 @@ resources:
     memory:
       min: 256Mi
       max: 512Mi
+
+    

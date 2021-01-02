@@ -76,9 +76,9 @@ spec:
             memory: "{{ resources.torrent.memory.max }}"
         env:
         - name: PUID
-          value: "1000"
+          value: "{{ nfs_puid }}"
         - name: GUID
-          value: "1000"
+          value: "{{ nfs_pgid }}"
         - name: UMASK_SET
           value: "22"
         - name: WEBUI_PORT

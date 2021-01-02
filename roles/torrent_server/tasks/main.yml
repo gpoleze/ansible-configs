@@ -1,0 +1,33 @@
+- name: Creat tmp folder
+  file:
+    name: tmp
+    state: directory
+
+- name: Template the K8S config files
+  template:
+    src: "templates/{{ item }}.yml.j2"
+    dest: "tmp/{{ item }}.yml"
+    mode: "0444"
+  with_items:
+  - secrets
+  - deployment
+  - services
+
+- name: deploy items
+  command: >-
+    kubectl apply -f tmp/{{ item }}.yml --record
+  changed_when: "'created' in deploy_output.stdout or 'configured' in deploy_output.stdout"
+  register: deploy_output
+  with_items:
+  - secrets
+  - deployment
+  - services
+
+- name: Check rollout
+  include_role:
+    name: k8s_check_rollout
+  vars:
+    k8_deployment_name: torrent-server
+    k8_namespace: "{{ namespace }}"
+    retries: 30
+    delay: 10

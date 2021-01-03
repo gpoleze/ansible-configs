@@ -1,0 +1,18 @@
+---
+- hosts: localhost
+  tasks:
+  - name: Get latest release of a public repository
+    github_release:
+      user: kubernetes
+      repo: dashboard
+      action: latest_release
+    register: dashboard_latest_release
+
+- hosts: 192.168.0.56
+  remote_user: ansible
+  vars:
+    dashboard_latest_release: "{{ hostvars['localhost']['dashboard_latest_release'].tag }}"
+
+  roles:
+  - k8s_dashboard
+  

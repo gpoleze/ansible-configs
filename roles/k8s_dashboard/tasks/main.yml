@@ -19,8 +19,17 @@
   register: admin_user_deploy_result
   changed_when: "'created' in admin_user_deploy_result.stdout or 'configured' in admin_user_deploy_result.stdout"
 
+- name: Get Secret name
+  shell: kubectl -n kubernetes-dashboard get secret | grep admin-user | awk '{print $1}'
+  register: secret_name
+
+- name: Get Token
+  shell: >-
+    kubectl -n kubernetes-dashboard describe secret {{ secret_name.stdout }} | grep "token:" | awk '{print $2}'
+  register: kubectl_token
+
 - name: add token to kubeconfig
   shell: >-
-    kubectl config set-credentials kubernetes-admin --token="$(kubectl -n kube-system describe secret default| awk '$1=="token:"{print $2}')" 
+    kubectl config set-credentials kubernetes-admin --token="{{ kubectl_token.stdout }}"
   register: result
   failed_when: result.stdout != 'User "kubernetes-admin" set.'

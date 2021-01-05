@@ -15,7 +15,7 @@ network:
         addresses: 
         - 1.1.1.1
         - 1.1.0.0
-{% if wifi_ssid %}
+{% if wifi_ssid is defined %}
   wifis:
     wlan0:
       access-points:

@@ -1,0 +1,25 @@
+---
+# Ansible itself related variable
+ansible_sudo_pass: "{{ vault_ansible_sudo_pass }}"
+user_ansible_keys:
+  public: "{{ vault_user_ansible_keys.public }}"
+  private_key: "{{ vault_user_ansible_keys.private_key }}"
+
+# Pihole
+pihole_web_password: "{{ vault_pihole_web_password }}"
+
+# Time Machine
+time_machine_passsword: "{{ vault_time_machine_passsword }}"
+
+## MicroK8s Cluster
+microk8s_cluster:
+  certificate_authority_data: "{{ vault_microk8s_cluster.certificate_authority_data }}"
+  token: "{{ vault_microk8s_cluster.token }}"
+  ip: 192.169.0.160
+
+# NordVpn
+nordvpn_username: "{{ vault_nordvpn_username }}"
+nordvpn_password: "{{ vault_nordvpn_password }}"
+
+# Plex
+plex_claim: "{{ vault_plex_claim }}"

@@ -1,0 +1,13 @@
+---
+- hosts: localhost
+  tasks:
+  - name: Deploy torrent server
+    block:
+    - include_role:
+        name: torrent_server
+
+    always:
+    - name: Cleanup template files
+      file:
+        path: "tmp"
+        state: absent

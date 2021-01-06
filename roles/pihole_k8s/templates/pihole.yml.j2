@@ -32,6 +32,9 @@ spec:
       - name: pihole-container
         image: pihole/pihole:latest
         imagePullPolicy: Always
+        securityContext:
+          capabilities:
+            add: ["NET_ADMIN", "SYS_NICE"]
         resources:
           requests:
             cpu: "250m"

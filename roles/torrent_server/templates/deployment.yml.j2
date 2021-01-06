@@ -1,0 +1,119 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: torrent-server
+  namespace: {{ namespace }}
+  labels:
+    name:  torrent-server
+spec:
+  selector:
+    matchLabels:
+      app: torrent-server
+  template:
+    metadata:
+      labels:
+        app: torrent-server
+    spec:
+      containers:
+      - image:  bubuntux/nordvpn
+        name:  vpn
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "{{ resources.vpn.cpu.min }}"
+            memory: "{{ resources.vpn.memory.min }}"
+          limits:
+            cpu: "{{ resources.vpn.cpu.max }}"
+            memory: "{{ resources.vpn.memory.max }}"
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+            - SYS_MODULE
+        env:
+        - name: CONNECT
+          value: United_States
+        - name: USER
+          valueFrom:
+            secretKeyRef:
+              name: nordvpn-secrets
+              key: NORDVPN_USERNAME
+        - name: PASS
+          valueFrom:
+            secretKeyRef:
+              name: nordvpn-secrets
+              key: NORDVPN_PASSWORD
+        - name: TECHNOLOGY
+          value: NordLynx
+        readinessProbe:
+          exec:
+            command: ["/usr/bin/nordvpn", "status", "|", "grep", "'Status: Connected'"]
+          initialDelaySeconds: 120
+          timeoutSeconds: 10            
+        livenessProbe:
+          exec:
+            command: ["/usr/bin/nordvpn", "status", "|", "grep", "'Status: Connected'"]
+          initialDelaySeconds: 30
+          timeoutSeconds: 10
+      - image: linuxserver/qbittorrent
+        name: torrent
+        imagePullPolicy: Always
+        ports:
+        - name:  http
+          containerPort:  8080
+        - name:  tcp-6881
+          containerPort:  6881
+        - name:  udp-6881
+          containerPort:  6881
+          protocol: UDP
+        resources:
+          requests:
+            cpu: "{{ resources.torrent.cpu.min }}"
+            memory: "{{ resources.torrent.memory.min }}"
+          limits:
+            cpu: "{{ resources.torrent.cpu.max }}"
+            memory: "{{ resources.torrent.memory.max }}"
+        env:
+        - name: PUID
+          value: "{{ nfs_puid }}"
+        - name: GUID
+          value: "{{ nfs_pgid }}"
+        - name: UMASK_SET
+          value: "22"
+        - name: WEBUI_PORT
+          value: "8080"
+        - name: TZ
+          value: America/Vancouver
+        volumeMounts:
+        - mountPath: /downloads
+          name: downloads
+        - mountPath: /media
+          name: media
+        - mountPath: /config
+          name: config
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 30
+          timeoutSeconds: 10  
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 30
+          timeoutSeconds: 10     
+      volumes:
+        - name: config
+          nfs:
+            server: {{ nfs_server_ip }}
+            path: "{{ nfs_base_path }}/k8svolumes/qbittorrent"
+        - name: media
+          nfs:
+            server: {{ nfs_server_ip }}
+            path: "{{ nfs_base_path }}/arquivos/"
+        - name: downloads
+          nfs:
+            server: {{ nfs_server_ip }}
+            path: "{{ nfs_base_path }}/arquivos/downloads"

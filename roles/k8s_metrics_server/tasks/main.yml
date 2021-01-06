@@ -1,0 +1,32 @@
+---
+- name: Create temp folder
+  file:
+    path: ./tmp
+    state: directory
+
+- name: Download Latest Manifets
+  get_url:
+    url: "https://github.com/kubernetes-sigs/metrics-server/releases/download/{{ metrics_server_release_version }}/components.yaml"
+    dest: ./tmp/components.yaml
+
+- name: line insert
+  lineinfile:
+    path: ./tmp/components.yaml
+    insertbefore: "^.*--cert-dir=/tmp"
+    line: "          - --kubelet-insecure-tls"
+
+- name: line insert
+  lineinfile:
+    path: ./tmp/components.yaml
+    insertafter: "^.*--secure-port=4443"
+    line: "          - --kubelet-preferred-address-types=InternalIP"
+ 
+- name: deploy metrics server
+  command: kubectl apply -f ./tmp/components.yaml
+  register: metrics_server_deploy_results
+  changed_when: "'created' in metrics_server_deploy_results.stdout or 'configured' in metrics_server_deploy_results.stdout"
+
+- name: clean tmp folder
+  file:
+    path: ./tmp
+    state: absent

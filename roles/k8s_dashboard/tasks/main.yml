@@ -1,0 +1,35 @@
+---
+- name: Debug
+  debug:
+    var: dashboard_latest_release
+
+- name: Deploy Dashboard
+  command: >-
+    kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/{{ dashboard_latest_release }}/aio/deploy/recommended.yaml
+  register: dashboard_deploy_result
+  changed_when: "'created' in dashboard_deploy_result.stdout or 'configured' in dashboard_deploy_result.stdout"
+
+- name: Copy dashboard-adminuser file
+  copy:
+    src: roles/k8s_dashboard/files/dashboard-adminuser.yml
+    dest: /tmp/dashboard-adminuser.yml
+
+- name: Configure admin user
+  command: kubectl apply -f /tmp/dashboard-adminuser.yml
+  register: admin_user_deploy_result
+  changed_when: "'created' in admin_user_deploy_result.stdout or 'configured' in admin_user_deploy_result.stdout"
+
+- name: Get Secret name
+  shell: kubectl -n kubernetes-dashboard get secret | grep admin-user | awk '{print $1}'
+  register: secret_name
+
+- name: Get Token
+  shell: >-
+    kubectl -n kubernetes-dashboard describe secret {{ secret_name.stdout }} | grep "token:" | awk '{print $2}'
+  register: kubectl_token
+
+- name: add token to kubeconfig
+  shell: >-
+    kubectl config set-credentials kubernetes-admin --token="{{ kubectl_token.stdout }}"
+  register: result
+  failed_when: result.stdout != 'User "kubernetes-admin" set.'

@@ -32,3 +32,29 @@
     k8_namespace: applications
     retries: 30
     delay: 10
+
+- name: check services have same IP
+  command: kubectl get svc plex-svc-{{ item }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+  register: load_balancer_ip
+  with_items:
+  - udp
+  - tcp
+
+- name: Register Services IP's
+  set_fact:
+    service_tcp_ip: "{{ load_balancer_ip.results | json_query('[?item==`tcp`].stdout') }}"
+    service_udp_ip: "{{ load_balancer_ip.results | json_query('[?item==`udp`].stdout') }}"
+  
+- name: Delete Services
+  when: service_tcp_ip != service_udp_ip
+  command: kubectl delete svc plex-svc-{{ item }}
+  with_items:
+  - udp
+  - tcp
+  
+- name: Redeploy Services
+  command: >-
+    kubectl apply -f tmp/services.yml --record
+  changed_when: "'created' in deploy_output.stdout or 'configured' in deploy_output.stdout"
+  register: deploy_output
+  when: service_tcp_ip != service_udp_ip

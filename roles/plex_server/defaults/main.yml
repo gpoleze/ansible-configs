@@ -15,13 +15,13 @@ plex_gid: 1004
 plex_timezone: America/Vancouver
 plex_extra_ports:
   tcp:
-  - { number: 3005, name: "plex-home-theater" }
+  - { number: 3005, name: "plex-home-thtr" }
   - { number: 8324, name: "plex-for-roku" }
-  - { number: 32469, name: "plex-DLNA-TCP" }
+  - { number: 32469, name: "plex-dlna-tcp" }
   udp:
-  - { number: 1900, name: "plex-DLNA-UDP" }
-  - { number: 5353, name: "Bonjour-Avahi " }
-  - { number: 32410, name: "GDM-Network-Discovery-1" }
-  - { number: 32412, name: "GDM-Network-Discovery-2" }
-  - { number: 32413, name: "GDM-Network-Discovery-3" }
-  - { number: 32414, name: "GDM-Network-Discovery-4" }
+  - { number: 1900, name: "plex-dlna-udp" }
+  - { number: 5353, name: "bonjour-avahi" }
+  - { number: 32410, name: "gdm-net-disc-1" }
+  - { number: 32412, name: "gdm-net-disc-2" }
+  - { number: 32413, name: "gdm-net-disc-3" }
+  - { number: 32414, name: "gdm-net-disc-4" }

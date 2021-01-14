@@ -2,8 +2,10 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: plex-pv
+  name: plex-media-pv
   labels:
+    app: plex
+    type: media
     location: truenas
 spec:
   storageClassName: nfs
@@ -16,7 +18,7 @@ spec:
     - nfsvers=3
   nfs:
     server: {{ nfs_server_ip }}
-    path: "{{ nfs_mount_path }}"
+    path: "{{ nfs_mount_path }}/arquivos/Plex"
 
 ---
 apiVersion: v1
@@ -24,6 +26,8 @@ kind: PersistentVolume
 metadata:
   name: plex-config-pv
   labels:
+    app: plex
+    type: config
     location: truenas
 spec:
   storageClassName: nfs
@@ -36,7 +40,7 @@ spec:
     - nfsvers=3
   nfs:
     server: {{ nfs_server_ip }}
-    path: "{{ nfs_mount_path }}/config"
+    path: "{{ nfs_mount_path }}/k8svolumes/plex"
 
 ---
 apiVersion: v1
@@ -53,12 +57,16 @@ spec:
   resources:
     requests:
       storage: 100Gi
+  selector:
+    matchLabels:
+      app: plex
+      type: config
 
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: plex-pvc
+  name: plex-media-pvc
   namespace: {{ plex_namespace }}
   labels:
     app: plex
@@ -69,4 +77,7 @@ spec:
   resources:
     requests:
       storage: 100Gi
-
+  selector:
+    matchLabels:
+      app: plex
+      type: media

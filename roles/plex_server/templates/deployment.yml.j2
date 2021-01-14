@@ -24,6 +24,18 @@ spec:
           limits:
             memory: {{ resources.max.memory }}
             cpu: {{ resources.max.cpu }}
+        readinessProbe:
+          httpGet:
+            path: /web
+            port: pms-port
+          initialDelaySeconds: 30
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /web
+            port: pms-port
+          initialDelaySeconds: 30
+          periodSeconds: 5
         env: 
         - name: PLEX_UID
           value: "{{ plex_uid }}"

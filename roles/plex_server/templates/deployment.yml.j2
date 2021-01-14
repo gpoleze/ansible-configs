@@ -74,9 +74,8 @@ spec:
             mountPath: /media
       volumes:
         - name: config-volume
-          nfs:
-            server: {{ nfs_server_ip }}
-            path: "{{ nfs_mount_path }}/config"
+          persistentVolumeClaim:
+            claimName: plex-config-pvc
         - name: media-volume
           persistentVolumeClaim:
             claimName: plex-pvc

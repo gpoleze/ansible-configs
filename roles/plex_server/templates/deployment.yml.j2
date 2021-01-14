@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: plex
-  namespace: applications
+  namespace: {{ plex_namespace }}
 spec:
   selector:
     matchLabels:
@@ -42,13 +42,17 @@ spec:
               name: plex-cm
               key: PLEX_ADVERTISE_IP
         ports:
+        - containerPort: 32400
+          name: pms-port
         # TCP PORTS
-{% for port in plex_ports.tcp %}
-        - containerPort: {{ port }}
+{% for port in plex_extra_ports.tcp %}
+        - containerPort: {{ port.number }}
+          name: {{ port.name }}
 {% endfor %}
         # UDP PORTS
-{% for port in plex_ports.udp %}
-        - containerPort: {{ port }}
+{% for port in plex_extra_ports.udp %}
+        - containerPort: {{ port.number }}
+          name: {{ port.name }}
           protocol: UDP
 {% endfor %}
         volumeMounts:

@@ -1,0 +1,19 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: plex-cm
+  labels:
+    app: plex
+data:
+  PLEX_ADVERTISE_IP: {{ plex_advertise_ip }}
+
+---
+apiVersion: v1
+data:
+ PLEX_CLAIM_VALUE: {{ plex_claim | b64encode }}
+kind: Secret
+metadata:
+ name: plex-secrets
+ namespace: applications
+type: Opaque

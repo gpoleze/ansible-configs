@@ -1,0 +1,14 @@
+- name: Create tmp folder
+  file:
+    path: ./tmp
+    state: directory
+
+- name: Generate manifests
+  template:
+    src: "templates/{{ item }}.yml.j2"
+    dest: "./tmp/{{ item }}.yml"
+  with_items:
+  - configs
+  - deployment
+  - services
+  - volumes

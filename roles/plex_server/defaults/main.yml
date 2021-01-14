@@ -1,6 +1,6 @@
 plex_namespace: applications
 nfs_server_ip: 192.168.0.225
-nfs_mount_path: /mnt/storage0/arquivos/Plex
+nfs_mount_path: /mnt/storage0
 plex_advertise_ip: http://192.168.0.65:32400/,https://plex.casa.com/
 plex_image: gpoleze/pms:arm64
 resources:

@@ -11,7 +11,7 @@ data:
 ---
 apiVersion: v1
 data:
- PLEX_CLAIM_VALUE: Y2xhaW0tQUVadU5zczlWNmdyalhOUGpKSFc=
+ PLEX_CLAIM_VALUE: {{ plex_claim_value }}
 kind: Secret
 metadata:
  name: plex-secrets
@@ -34,11 +34,7 @@ spec:
     - ReadWriteMany
   mountOptions:
     - hard
-    # - rw
-    # - sync
-    # - no_subtree_check
-    # - no_root_squash
-    - nfsvers=4
+    - nfsvers=3
   nfs:
     server: 192.168.0.225
     path: "/mnt/storage0/arquivos/Plex"
@@ -74,10 +70,9 @@ spec:
       labels:
         app: plex
     spec:
-      hostNetwork: true
       containers:
       - name: plex-container
-        image: linuxserver/plex
+        image: gpoleze/pms:arm64
         imagePullPolicy: Always
         # resources:
         #   limits:
@@ -90,6 +85,8 @@ spec:
           value: "1002"
         - name: PGID
           value: "1004"
+        - name: TZ
+          value: "America/Vancouver"
         - name: PLEX_CLAIM
           valueFrom: 
             secretKeyRef:
@@ -148,12 +145,12 @@ metadata:
   name:  plex-svc-tcp
   namespace: applications
   annotations:
-    metallb.universe.tf/allow-shared-ip: plex_shared_dns
+    metallb.universe.tf/allow-shared-ip: plex_pms_shared_dns
 spec:
   selector:
     app:  plex
   type:  LoadBalancer
-  loadBalancerIP: 192.168.0.65
+  externalTrafficPolicy: Cluster
   ports:
   - name: tcp-3005
     port: 3005
@@ -174,13 +171,12 @@ metadata:
   name:  plex-svc-udp
   namespace: applications
   annotations:
-    metallb.universe.tf/allow-shared-ip: plex_shared_dns
+    metallb.universe.tf/allow-shared-ip: plex_pms_shared_dns
 spec:
   selector:
     app:  plex
   type:  LoadBalancer
-  loadBalancerIP: 192.168.0.65
-  # loadBalancerIP: {{ load_balancer_ip }}
+  externalTrafficPolicy: Cluster
   ports:
   - name: udp-1900
     port: 1900

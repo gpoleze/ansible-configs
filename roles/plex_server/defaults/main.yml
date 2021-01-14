@@ -1,3 +1,4 @@
+plex_namespace: applications
 nfs_server_ip: 192.168.0.225
 nfs_mount_path: /mnt/storage0/arquivos/Plex
 plex_advertise_ip: http://192.168.0.65:32400/,https://plex.casa.com/
@@ -12,16 +13,15 @@ resources:
 plex_uid: 1002
 plex_gid: 1004
 plex_timezone: America/Vancouver
-plex_ports:
+plex_extra_ports:
   tcp:
-  - 3005
-  - 8324
-  - 32400
-  - 32469
+  - { number: 3005, name: "plex-home-theater" }
+  - { number: 8324, name: "plex-for-roku" }
+  - { number: 32469, name: "plex-DLNA-TCP" }
   udp:
-  - 1900
-  - 5353
-  - 32410
-  - 32412
-  - 32413
-  - 32414
+  - { number: 1900, name: "plex-DLNA-UDP" }
+  - { number: 5353, name: "Bonjour-Avahi " }
+  - { number: 32410, name: "GDM-Network-Discovery-1" }
+  - { number: 32412, name: "GDM-Network-Discovery-2" }
+  - { number: 32413, name: "GDM-Network-Discovery-3" }
+  - { number: 32414, name: "GDM-Network-Discovery-4" }

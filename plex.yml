@@ -6,8 +6,8 @@
     - include_role:
         name: plex_server
 
-    # always:
-    # - name: Cleanup template files
-    #   file:
-    #     path: "tmp"
-    #     state: absent
+    always:
+    - name: Cleanup template files
+      file:
+        path: "tmp"
+        state: absent

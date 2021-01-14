@@ -1,2 +1,27 @@
 nfs_server_ip: 192.168.0.225
-nfs_mount_path: /mnt/storage0/arquivos/gabriel
+nfs_mount_path: /mnt/storage0/arquivos/Plex
+plex_advertise_ip: http://192.168.0.65:32400/,https://plex.casa.com/
+plex_image: gpoleze/pms:arm64
+resources:
+  min:
+    cpu: "20m"
+    memory: "256Mi"
+  max:
+    cpu: "2000m"
+    memory: "2Gi"
+plex_uid: 1002
+plex_gid: 1004
+plex_timezone: America/Vancouver
+plex_ports:
+  tcp:
+  - 3005
+  - 8324
+  - 32400
+  - 32469
+  udp:
+  - 1900
+  - 5353
+  - 32410
+  - 32412
+  - 32413
+  - 32414

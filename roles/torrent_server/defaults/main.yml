@@ -20,4 +20,9 @@ resources:
       min: 256Mi
       max: 512Mi
 
+volumes:
+- gabriel
+- gisele
+- plex
+- downloads
     

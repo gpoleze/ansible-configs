@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: torrent-server
-  namespace: {{ namespace }}
+  namespace: "{{ namespace }}"
   labels:
     name:  torrent-server
 spec:
@@ -79,19 +79,19 @@ spec:
           value: "{{ nfs_puid }}"
         - name: GUID
           value: "{{ nfs_pgid }}"
-        - name: UMASK_SET
+        - name: UMASK
           value: "22"
         - name: WEBUI_PORT
           value: "8080"
         - name: TZ
           value: America/Vancouver
         volumeMounts:
-        - mountPath: /downloads
-          name: downloads
-        - mountPath: /media
-          name: media
         - mountPath: /config
           name: config
+{% for volume in volumes %}        
+        - mountPath: /{{ volume }}
+          name: {{ volume }}
+{% endfor %}
         readinessProbe:
           httpGet:
             path: /
@@ -103,17 +103,14 @@ spec:
             path: /
             port: http
           initialDelaySeconds: 30
-          timeoutSeconds: 10     
+          timeoutSeconds: 10
       volumes:
         - name: config
           nfs:
-            server: {{ nfs_server_ip }}
+            server: "{{ nfs_server_ip }}"
             path: "{{ nfs_base_path }}/k8svolumes/qbittorrent"
-        - name: media
-          nfs:
-            server: {{ nfs_server_ip }}
-            path: "{{ nfs_base_path }}/arquivos/"
-        - name: downloads
-          nfs:
-            server: {{ nfs_server_ip }}
-            path: "{{ nfs_base_path }}/arquivos/downloads"
+{% for volume in volumes %}        
+        - name: {{ volume }}
+          persistentVolumeClaim:
+            claimName: nfs-{{ volume }}-pvc
+{% endfor %}

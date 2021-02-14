@@ -1,0 +1,9 @@
+- hosts: localhost
+  roles:
+  - idrive_vm/create_vm
+
+- hosts: idrive_vm
+  remote_user: "{{ proxmox.idrive.user }}"
+  tasks:
+  - name: Check vm is up
+    command: ls /

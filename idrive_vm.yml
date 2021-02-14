@@ -4,6 +4,6 @@
 
 - hosts: idrive_vm
   remote_user: "{{ proxmox.idrive.user }}"
-  tasks:
-  - name: Check vm is up
-    command: ls /
+  roles:
+    - idrive_vm/install
+    - create_ansible_user

@@ -1,0 +1,38 @@
+- name: Update Ubuntu
+  apt:
+    update_cache: yes
+    upgrade: dist
+  notify: reboot
+
+- name: Install required packages
+  apt:
+    name:
+    - nfs-common
+    - unzip
+    - perl
+    state: present
+
+- name: Unzip IDrive
+  unarchive:
+    src: https://www.idrivedownloads.com/downloads/linux/download-for-linux/IDrive_Scripts/IDriveForLinux.zip
+    dest: /
+    remote_src: yes
+    mode: "0775"
+
+- name: Create Mount points
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - "/mnt/arquivos"
+    - "/mnt/k8svolumes"
+
+- name: Add NFS mounts
+  mount:
+    path: "{{ item.mount }}"
+    src: "{{ item.src }}"
+    fstype: "{{ item.fstype }}"
+    state: mounted
+  with_items:
+    - {mount: "/mnt/arquivos", src: "192.168.0.225:/mnt/storage0/arquivos", fstype: "nfs"}
+    - {mount: "/mnt/k8svolumes", src: "192.168.0.225:/mnt/storage0/k8svolumes", fstype: "nfs"}

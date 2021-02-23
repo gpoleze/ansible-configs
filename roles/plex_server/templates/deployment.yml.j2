@@ -44,7 +44,7 @@ spec:
         - name: TZ
           value: "{{ plex_timezone }}"
         - name: PLEX_CLAIM
-          valueFrom: 
+          valueFrom:
             secretKeyRef:
               name: plex-secrets
               key: PLEX_CLAIM_VALUE

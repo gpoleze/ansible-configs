@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metatada:
+  name: code-server
+  namespace: applications
+  labels:
+    app: code-server
+specs:
+  replicas: 1
+  revisionHistotyLimit: 5
+  selector:
+    matchLabels:
+      app: code-server
+  template:
+    metadata:
+      name: code-server-pod
+      labels:
+        app: code-server
+    spec:
+      containers:
+        - name: code-server-container
+          image: linuxserver/code-server:latest
+          imagePullPolicy: Always
+          env:
+            - TZ = America/Vancouver
+            - PROXY_DOMAIN=code-server.casa.com
+            - SUDO_PASSWORD=password
+            - PASSWORD=password
+          volumeMounts:
+            - name: config
+              mountPath: /config
+        volumes:
+          - name: config
+            nfs:
+              server: {{ nfs_server_ip }}
+              path: "{{ nfs_mount_path }}k8svolumes/code-server"
+

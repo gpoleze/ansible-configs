@@ -34,7 +34,8 @@ spec:
           image: linuxserver/code-server:latest
           imagePullPolicy: Always
           ports:
-          - containerPort: 8443
+          - name: liveness-probe
+            containerPort: 8443
           env:
           - name: TZ
             value: America/Vancouver
@@ -51,6 +52,18 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /config
+          readinessProbe:
+            httpGet:
+              path: /login
+              port: liveness-probe
+            initialDelaySeconds: 60
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /login
+              port: liveness-probe
+            initialDelaySeconds: 60
+            periodSeconds: 10
       volumes:
       - name: config
         nfs:

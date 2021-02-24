@@ -1,0 +1,15 @@
+- name: Check rollout
+  include_role:
+    name: k8s_apply_changes
+  vars:
+    manifests:
+      - deployment
+
+- name: Check rollout
+  include_role:
+    name: k8s_check_rollout
+  vars:
+    k8_deployment_name: code-server
+    k8_namespace: applications
+    retries: 30
+    delay: 10

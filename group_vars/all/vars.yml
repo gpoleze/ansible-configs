@@ -23,3 +23,7 @@ nordvpn_password: "{{ vault_nordvpn_password }}"
 
 # Plex
 plex_claim: "{{ vault_plex_claim }}"
+
+# Code Server
+code_server_sudo_password: "{{ vault_code_server_sudo_password }}"
+code_server_login_password: "{{ vault_code_server_login_password }}"

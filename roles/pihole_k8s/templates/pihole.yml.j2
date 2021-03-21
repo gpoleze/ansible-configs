@@ -17,7 +17,7 @@ metadata:
     app: pihole
   namespace: {{ namespace }}
 spec:
-  replicas: 2
+  replicas: 1
   revisionHistoryLimit: 5
   selector:
     matchLabels: 
@@ -72,16 +72,11 @@ spec:
         volumeMounts:
         - mountPath: /etc/pihole/
           name: pihole-volume
-        - mountPath: /etc/dnsmasq.d/
-          name: dnsmasq-volume
-              
+
       volumes:
       - name: pihole-volume
         persistentVolumeClaim:
-          claimName: pihole-pvc-pihole
-      - name: dnsmasq-volume
-        persistentVolumeClaim:
-          claimName: pihole-pvc-dnsmasq
+          claimName: pihole-pvc
 
 ---
 apiVersion: v1

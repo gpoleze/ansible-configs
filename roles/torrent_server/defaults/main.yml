@@ -1,8 +1,8 @@
 namespace: applications
 nfs_server_ip: 192.168.0.225
 nfs_base_path: /mnt/storage0
-nfs_puid: 1002
-nfs_pgid: 1004
+nfs_puid: 1001
+nfs_pgid: 1002
 
 resources:
   vpn:

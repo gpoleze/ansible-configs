@@ -10,8 +10,8 @@ resources:
   max:
     cpu: "2000m"
     memory: "2Gi"
-plex_uid: 1002
-plex_gid: 1004
+plex_uid: 1001
+plex_gid: 1002
 plex_timezone: America/Vancouver
 plex_extra_ports:
   tcp:

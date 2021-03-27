@@ -6,10 +6,52 @@ metadata:
   namespace: network-services
   labels:
     app: pihole
+    location: longhorn
 spec:
   storageClassName: longhorn
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-pihole-pv
+  labels:
+    app: pihole
+    location: nfs
+spec:
+  storageClassName: nfs
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  mountOptions:
+    - hard
+    - nfsvers=3
+  nfs:
+    server: {{ nfs_server_ip }}
+    path: {{ nfs_mount_path }}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nfs-pihole-pvc
+  namespace: network-services
+  labels:
+    app: pihole
+spec:
+  selector:
+    matchLabels:
+      app: pihole
+      location: nfs
+  storageClassName: nfs
+  accessModes:
+    - ReadWriteMany
   resources:
     requests:
       storage: 1Gi

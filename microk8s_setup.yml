@@ -1,9 +1,0 @@
----
-- hosts: "{{ target_host }}"
-  remote_user: ansible
-  
-  roles:
-    - microk8s_setup
-    - include_role:
-      name: metallb_setup
-      when: add_bare_metal_load_balancer

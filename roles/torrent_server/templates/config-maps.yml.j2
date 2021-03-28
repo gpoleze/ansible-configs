@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: torrent-config
+  namespace: "{{ namespace }}"
+data:
+  PUID: "{{ nfs_puid }}"
+  PGID: "{{ nfs_pgid }}"
+  UMASK: "22"
+  WEBUI_PORT: "8080"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vpn-config
+  namespace: "{{ namespace }}"
+data:
+  CONNECT: United_States
+  TECHNOLOGY: NordLynx

@@ -5,7 +5,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: "nfs-{{ folder.name }}-pvc"
-  namespace: applications
+  namespace: {{ namespace }}
   labels:
     type: shared
     target: {{ folder.name }}

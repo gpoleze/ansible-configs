@@ -10,6 +10,7 @@
     mode: "0444"
   with_items:
   - secrets
+  - config-maps
   - deployment
   - services
 
@@ -20,6 +21,7 @@
   register: deploy_output
   with_items:
   - secrets
+  - config-maps
   - deployment
   - services
 

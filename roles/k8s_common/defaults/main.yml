@@ -1,5 +1,6 @@
 nfs_server_ip: 192.168.0.225
 nfs_mount_path: /mnt/storage0/
+namespace: applications
 
 tracked_folders:
 - {name: gabriel, path: "arquivos/Gabriel"}

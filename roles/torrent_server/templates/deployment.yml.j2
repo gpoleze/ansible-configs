@@ -31,21 +31,11 @@ spec:
             add:
             - NET_ADMIN
             - SYS_MODULE
-        env:
-        - name: CONNECT
-          value: United_States
-        - name: USER
-          valueFrom:
-            secretKeyRef:
+        envFrom:
+          - secretRef:
               name: nordvpn-secrets
-              key: NORDVPN_USERNAME
-        - name: PASS
-          valueFrom:
-            secretKeyRef:
-              name: nordvpn-secrets
-              key: NORDVPN_PASSWORD
-        - name: TECHNOLOGY
-          value: NordLynx
+          - configMapRef:
+              name: vpn-config
         readinessProbe:
           exec:
             command: ["/usr/bin/nordvpn", "status", "|", "grep", "'Status: Connected'"]
@@ -74,17 +64,15 @@ spec:
           limits:
             cpu: "{{ resources.torrent.cpu.max }}"
             memory: "{{ resources.torrent.memory.max }}"
+        envFrom:
+          - configMapRef:
+              name: torrent-config
         env:
-        - name: PUID
-          value: "{{ nfs_puid }}"
-        - name: PGID
-          value: "{{ nfs_pgid }}"
-        - name: UMASK
-          value: "22"
-        - name: WEBUI_PORT
-          value: "8080"
-        - name: TZ
-          value: America/Vancouver
+          - name: TZ
+            valueFrom:
+              configMapKeyRef:
+                key: timezone
+                name: timezone-configmap
         volumeMounts:
         - mountPath: /config
           name: config

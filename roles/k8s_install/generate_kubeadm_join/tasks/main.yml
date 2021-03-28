@@ -1,0 +1,46 @@
+- name: Check there is a valid Token
+  shell: >-
+    kubeadm token list
+    | awk '{if(NR>1)print $2}'
+    | sed 's/h//' | awk '{if($1>1) print $1}'
+  register: output
+
+- name: Does it have a valid token?
+  set_fact:
+    has_valid_token: "{{ output.stdout != '' }}"
+
+- name: Get Valid Token
+  shell: >-
+    kubeadm token list | awk '{ if(NR>1) print $1 }'
+  register: kubeadm_token_output
+  when: has_valid_token
+
+- name: Get Certificate
+  shell: >-
+    openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt \
+        | openssl rsa -pubin -outform der 2>/dev/null \
+        | openssl dgst -sha256 -hex \
+        | sed 's/^.* //'
+  register: certificate_output
+  when: has_valid_token
+
+- name: Build Join Command
+  set_fact:
+    kubeadm_join_command: >-
+      kubeadm join {{ ansible_default_ipv4.address }}:6443 \
+        --token {{ kubeadm_token_output.stdout }} \
+        --discovery-token-ca-cert-hash sha256:{{ certificate_output.stdout }}
+  when: has_valid_token
+
+- name: Create New token
+  command: kubeadm token create --print-join-command
+  register: kubeadm_token_stdout
+  when: not has_valid_token
+
+- name: Set Kubeadm join command
+  set_fact:
+    kubeadm_join_command: "{{ kubeadm_token_stdout.stdout }}"
+  when: not has_valid_token
+
+- debug:
+    var: kubeadm_join_command

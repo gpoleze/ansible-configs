@@ -8,7 +8,6 @@ data:
   PUID: "{{ nfs_puid }}"
   PGID: "{{ nfs_pgid }}"
   UMASK: "22"
-  WEBUI_PORT: "8080"
 
 ---
 apiVersion: v1
@@ -17,5 +16,5 @@ metadata:
   name: vpn-config
   namespace: "{{ namespace }}"
 data:
-  CONNECT: United_States
+  CONNECT: --group p2p
   TECHNOLOGY: NordLynx

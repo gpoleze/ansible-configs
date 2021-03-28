@@ -9,6 +9,7 @@
 
 - name: Update Ubuntu
   apt:
+    name: nfs-common
     update_cache: yes
     upgrade: dist
   notify: reboot

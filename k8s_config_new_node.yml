@@ -1,0 +1,19 @@
+---
+# Get Token
+- hosts: k8s-masters[0]
+  remote_user: ansible
+  become: true
+  roles:
+    - k8s_install/generate_kubeadm_join
+
+- hosts: "{{ target_node_ip }}"
+  remote_user: ansible
+  become: true
+  vars:
+    kubeadm_join_command: "{{ hostvars['K8S_TOKEN_HOLDER']['kubeadm_join_command'] }}"
+
+  tasks:
+  - name: Installing K8S requirements
+    include_role: k8s_install/node
+  - name: Join cluser
+    command: "{{ kubeadm_join_command }}"

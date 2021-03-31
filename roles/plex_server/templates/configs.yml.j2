@@ -3,18 +3,21 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: plex-cm
-  namespace: {{ plex_namespace }}
+  namespace: "{{ plex_namespace }}"
   labels:
     app: plex
 data:
-  PLEX_ADVERTISE_IP: {{ plex_advertise_ip }}
+  ADVERTISE_IP: "{{ plex_advertise_ip }}"
+  PLEX_UID: "{{ plex_uid }}"
+  PLEX_GID: "{{ plex_gid }}"
+  CHANGE_CONFIG_DIR_OWNERSHIP: "false"
 
 ---
 apiVersion: v1
-data:
- PLEX_CLAIM_VALUE: {{ plex_claim | b64encode }}
+stringData:
+  PLEX_CLAIM: "{{ plex_claim | b64encode }}"
 kind: Secret
 metadata:
  name: plex-secrets
- namespace: {{ plex_namespace }}
+ namespace: "{{ plex_namespace }}"
 type: Opaque

@@ -36,23 +36,17 @@ spec:
             port: pms-port
           initialDelaySeconds: 30
           periodSeconds: 5
-        env: 
-        - name: PLEX_UID
-          value: "{{ plex_uid }}"
-        - name: PLEX_GID
-          value: "{{ plex_gid }}"
+        envFrom:
+        - configMapRef:
+            name: plex-cm
+        - secretRef:
+           name: plex-secrets
+        env:
         - name: TZ
-          value: "{{ plex_timezone }}"
-        - name: PLEX_CLAIM
-          valueFrom:
-            secretKeyRef:
-              name: plex-secrets
-              key: PLEX_CLAIM_VALUE
-        - name: ADVERTISE_IP
           valueFrom:
             configMapKeyRef:
-              name: plex-cm
-              key: PLEX_ADVERTISE_IP
+              key: timezone
+              name: timezone-configmap
         ports:
         - containerPort: 32400
           name: pms-port
@@ -78,4 +72,4 @@ spec:
             claimName: plex-config-pvc
         - name: media-volume
           persistentVolumeClaim:
-            claimName: plex-media-pvc
+            claimName: nfs-plex-pvc

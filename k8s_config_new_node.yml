@@ -14,6 +14,7 @@
 
   tasks:
   - name: Installing K8S requirements
-    include_role: k8s_install/node
+    include_role:
+      name: k8s_install/node
   - name: Join cluser
-    command: "{{ kubeadm_join_command }}"
+    shell: "{{ kubeadm_join_command }}"

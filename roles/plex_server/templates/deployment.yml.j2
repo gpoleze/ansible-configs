@@ -24,12 +24,13 @@ spec:
           limits:
             memory: {{ resources.max.memory }}
             cpu: {{ resources.max.cpu }}
-        readinessProbe:
+        startupProbe:
           httpGet:
             path: /web
             port: pms-port
-          initialDelaySeconds: 30
-          periodSeconds: 5
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          failureThreshold: 3
         livenessProbe:
           httpGet:
             path: /web

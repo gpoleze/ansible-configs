@@ -1,3 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: code-server-config
+  namespace: applications
+data:
+  PUID: "{{ puid }}"
+  PGID: "{{ pgid }}"
 ---
 apiVersion: v1
 kind: Secret
@@ -37,32 +45,30 @@ spec:
           - name: liveness-probe
             containerPort: 8443
           env:
-          - name: TZ
-            value: America/Vancouver
-          - name: SUDO_PASSWORD
-            valueFrom:
-              secretKeyRef:
+            - name: TZ
+              valueFrom:
+                configMapKeyRef:
+                  key: timezone
+                  name: timezone-configmap
+          envFrom:
+            - configMapRef:
+                name: code-server-config
+            - secretRef:
                 name: code-server-secrets
-                key: SUDO_PASSWORD
-          - name: PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: code-server-secrets
-                key: LOGIN_PASSWORD
           volumeMounts:
             - name: config
               mountPath: /config
-          readinessProbe:
+          startupProbe:
             httpGet:
               path: /login
               port: liveness-probe
-            initialDelaySeconds: 60
+            initialDelaySeconds: 30
             periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /login
               port: liveness-probe
-            initialDelaySeconds: 60
+            initialDelaySeconds: 30
             periodSeconds: 10
       volumes:
       - name: config

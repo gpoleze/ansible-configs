@@ -2,7 +2,7 @@ plex_namespace: applications
 nfs_server_ip: 192.168.0.225
 nfs_mount_path: /mnt/storage0
 plex_advertise_ip: http://192.168.0.66:32400/
-plex_image: gpoleze/pms:latest
+plex_image: gpoleze/pms-docker:latest
 resources:
   min:
     cpu: "20m"

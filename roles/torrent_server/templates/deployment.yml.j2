@@ -16,6 +16,9 @@ spec:
         app: torrent-server
     spec:
       containers:
+      - image:  gpoleze/speedtest
+        name:  speedtest
+        tty: true
       - image:  bubuntux/nordvpn
         name:  vpn
         imagePullPolicy: Always
@@ -36,10 +39,10 @@ spec:
               name: nordvpn-secrets
           - configMapRef:
               name: vpn-config
-        readinessProbe:
+        startupProbe:
           exec:
             command: ["/usr/bin/nordvpn", "status", "|", "grep", "'Status: Connected'"]
-          initialDelaySeconds: 120
+          initialDelaySeconds: 60
           timeoutSeconds: 10
         livenessProbe:
           exec:
@@ -82,12 +85,12 @@ spec:
         - mountPath: /{{ volume }}
           name: {{ volume }}
 {% endfor %}
-        readinessProbe:
+        startupProbe:
           httpGet:
             path: /
             port: http
-          initialDelaySeconds: 30
-          timeoutSeconds: 10  
+          initialDelaySeconds: 90
+          timeoutSeconds: 10
         livenessProbe:
           httpGet:
             path: /

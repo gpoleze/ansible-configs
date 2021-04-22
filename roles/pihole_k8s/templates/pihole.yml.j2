@@ -1,40 +1,11 @@
 ---
-apiVersion: v1
-stringData:
- PIHOLE_WEBPASSWORD: "{{ pihole_web_password }}"
-kind: Secret
-metadata:
- name: pihole-secrets
- namespace: {{ namespace }}
-type: Opaque
-
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
- name: dns-providers-configmap
- namespace: {{ namespace }}
-data:
-  cloud-flare1: "1.1.1.1"
-  cloud-flare2: "1.1.0.0"
-
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
- name: timezone-configmap
- namespace: {{ namespace }}
-data:
-  timezone: America/Vancouver
-
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: pihole
   labels:
     app: pihole
-  namespace: {{ namespace }}
+  namespace: "{{ namespace }}"
 spec:
   replicas: 2
   revisionHistoryLimit: 5
@@ -62,41 +33,43 @@ spec:
             cpu: "750m"
             memory: "512M"
         ports:
-        - name: liveness-port
+        - name: http-port
           containerPort: 80
+        - name: https-port
+          containerPort: 443
+        - name: dns-port-tcp
+          containerPort: 53
+        - name: dns-port-udp
+          containerPort: 53
+          protocol: UDP
+        - name: dnssec-port-tcp
+          containerPort: 853
+        - name: dnssec-port-udp
+          containerPort: 853
+          protocol: UDP
         livenessProbe:
           httpGet:
             path: /admin/index.html
-            port: liveness-port
+            port: http-port
           initialDelaySeconds: 60
           periodSeconds: 10
         startupProbe:
           httpGet:
             path: /admin/index.html
-            port: liveness-port
-          initialDelaySeconds: 30
+            port: http-port
+          initialDelaySeconds: 60
           periodSeconds: 10
-        env:
-        - name: WEBPASSWORD
-          valueFrom:
-            secretKeyRef:
+        envFrom:
+          - secretRef:
               name: pihole-secrets
-              key: PIHOLE_WEBPASSWORD
+          - configMapRef:
+              name: dns-providers-configmap
+        env:
         - name: TZ
           valueFrom:
             configMapKeyRef:
               name: timezone-configmap
               key: timezone
-        - name: DNS1
-          valueFrom:
-            configMapKeyRef:
-              name: dns-providers-configmap
-              key: cloud-flare1
-        - name: DNS2
-          valueFrom:
-            configMapKeyRef:
-              name: dns-providers-configmap
-              key: cloud-flare2
         volumeMounts:
         - mountPath: /etc/pihole/
           name: pihole-volume
@@ -105,48 +78,3 @@ spec:
       - name: pihole-volume
         persistentVolumeClaim:
           claimName: nfs-pihole-pvc
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: pihole-service-tcp
-  namespace: {{ namespace }}
-  annotations:
-    metallb.universe.tf/address-pool: microk8s-ip-space
-    metallb.universe.tf/allow-shared-ip: pihole_shared_dns
-spec:
-  selector:
-    app: pihole
-  type: LoadBalancer
-  loadBalancerIP: {{ load_balancer_ip }}
-  ports:
-  - port: 80
-    targetPort: 80
-    name: pihole-admin
-  - port: 53
-    targetPort: 53
-    protocol: TCP
-    name: dns-tcp
-  externalTrafficPolicy: Local
-  
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: pihole-service-udp
-  namespace: {{ namespace }}
-  annotations:
-    metallb.universe.tf/address-pool: microk8s-ip-space
-    metallb.universe.tf/allow-shared-ip: pihole_shared_dns
-spec:
-  selector:
-    app: pihole
-  type: LoadBalancer
-  loadBalancerIP: {{ load_balancer_ip }}
-  ports:
-  - port: 53
-    targetPort: 53
-    protocol: UDP
-    name: dns-udp
-  externalTrafficPolicy: Local

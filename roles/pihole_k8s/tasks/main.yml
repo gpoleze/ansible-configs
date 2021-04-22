@@ -3,31 +3,45 @@
     name: tmp
     state: directory
 
+- name: k8s manifests
+  set_fact:
+    k8s_manifests:
+    - namespace
+    - volumes
+    - pihole
+    - config_maps
+    - services
+
+
 - name: Template the K8S config files
   template:
     src: "templates/{{ item }}.yml.j2"
     dest: "tmp/{{ item }}.yml"
     mode: "0444"
-  with_items:
-  - namespace
-  - volumes
-  - pihole
+  with_items: "{{ k8s_manifests }}"
 
 - name: deploy items
-  command: >-
-    kubectl apply -f tmp/{{ item }}.yml --record
-  changed_when: "'created' in deploy_output.stdout or 'configured' in deploy_output.stdout"
+  k8s:
+    state: present
+    src: "tmp/{{ item }}.yml"
+#    resource_definition: "{{ lookup('template', item + '.yml.j2') | from_yaml }}"
+#    resource_definition: "{{ lookup('template', 'volumes.yml.j2') | from_yaml }}"
+#  command: >-
+#    kubectl apply -f tmp/{{ item }}.yml --record
+#  changed_when: "'created' in deploy_output.stdout or 'configured' in deploy_output.stdout"
   register: deploy_output
-  with_items:
-  - namespace
-  - volumes
-  - pihole
+  with_items: "{{ k8s_manifests }}"
+#  - namespace
+#  - volumes
+#  - pihole.yml.j2
+#  - config_maps
+#  - services
 
-- name: Check rollout
-  include_role:
-    name: k8s_check_rollout
-  vars:
-    k8_deployment_name: pihole
-    k8_namespace: network-services
-    retries: 30
-    delay: 10
+#- name: Check rollout
+#  include_role:
+#    name: k8s_check_rollout
+#  vars:
+#    k8_deployment_name: pihole
+#    k8_namespace: network-services
+#    retries: 30
+#    delay: 10

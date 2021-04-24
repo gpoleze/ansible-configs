@@ -63,12 +63,16 @@ spec:
           protocol: UDP
 {% endfor %}
         volumeMounts:
-          - name: config-volume
+          - name: plex-volume
             mountPath: /config
+            subPath: config
+          - name: plex-volume
+            mountPath: /transcode
+            subPath: transcode
           - name: media-volume
             mountPath: /media
       volumes:
-        - name: config-volume
+        - name: plex-volume
           persistentVolumeClaim:
             claimName: plex-config-pvc
         - name: media-volume

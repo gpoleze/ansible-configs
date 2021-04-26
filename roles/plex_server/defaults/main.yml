@@ -5,7 +5,7 @@ plex_advertise_ip: http://192.168.0.66:32400/
 plex_image: gpoleze/pms-docker:latest
 resources:
   min:
-    cpu: "20m"
+    cpu: "500m"
     memory: "256Mi"
   max:
     cpu: "2000m"

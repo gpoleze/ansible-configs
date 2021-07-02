@@ -1,0 +1,6 @@
+- hosts: semaphore
+  remote_user: "{{ remote_user | default('ubuntu') }}"
+  become: true
+  roles:
+  - kubectl_install
+  # - semaphore_install

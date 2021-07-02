@@ -1,0 +1,7 @@
+---
+- name: Deploy Databases
+  hosts: "k8s-master[0]"
+  remote_user: ansible
+  become: true
+  roles:
+    deploy_databases/mysql

@@ -22,10 +22,10 @@
     path: "/home/{{ remote_user | default('ubuntu') }}/.kube"
 
 - name: Add kubeconfig to .kube
-  copy:
-    src: "{{ lookup('template', 'roles/kubectl_install/templates/kubeconfig.yml.js') }}"
+  template:
+    src: templates/kubeconfig.yml.j2
     dest: "/home/{{ remote_user | default('ubuntu') }}/.kube/config"
     owner: root
     group: root
     mode: '0644'
-    backup: yes
+    no_log: true

@@ -1,0 +1,21 @@
+# From: https://github.com/ansible-semaphore/semaphore/wiki/Install-Semaphore-on-Debian-like-Linux-with-MySQL-8
+
+
+- name: start MySql docker
+  docker_container:
+    state: started
+    name: mysql
+    image: mysql:8
+    ports:
+    - "3306:3306"
+    env: 
+      MYSQL_ROOT_PASSWORD: "my-secret-pw"
+      MYSQL_DATABASE: semaphore
+      MYSQL_USER: semaphore
+      MYSQL_PASSWORD: semaphore
+
+- name: Download binary
+  apt:
+    deb: https://github.com/ansible-semaphore/semaphore/releases/download/v2.7.0/semaphore_2.7.0_linux_amd64.deb
+    state: present
+

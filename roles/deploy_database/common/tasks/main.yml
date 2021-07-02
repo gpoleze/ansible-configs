@@ -1,0 +1,4 @@
+- name:  Create namespace
+  k8s:
+    state: present
+    src: files/namespace.yml

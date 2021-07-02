@@ -1,0 +1,4 @@
+- name: Run common command
+  include_role: deploy_database/common
+
+

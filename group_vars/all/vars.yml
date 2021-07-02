@@ -13,7 +13,7 @@ time_machine_passsword: "{{ vault_time_machine_passsword }}"
 
 ## MicroK8s Cluster
 k8s_cluster:
-  certificate_authority_data: "{{ vault_microk8s_cluster.certificate_authority_data }}"
+  certificate_authority_data: "{{ vault_k8s_cluster.certificate_authority_data }}"
   client_certificate_data: "{{ vault_k8s_cluster.client_certificate_data }}"
   client_key_data: "{{ vault_k8s_cluster.client_key_data }}"
   token: "{{ vault_k8s_cluster.token }}"

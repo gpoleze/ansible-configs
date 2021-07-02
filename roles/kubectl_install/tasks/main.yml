@@ -1,0 +1,19 @@
+- name: Update the apt package index and install required packages
+  apt:
+    update_cache: yes
+    name:
+    - apt-transport-https 
+    - ca-certificates 
+    state: present
+
+- name: Add Apt key
+  apt_key:
+    url: /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+
+
+- name: Install kubectl
+  apt:
+    update_cache: yes
+    name: kubectl
+    state: present

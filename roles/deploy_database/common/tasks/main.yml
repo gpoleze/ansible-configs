@@ -1,4 +1,4 @@
 - name:  Create namespace
   k8s:
     state: present
-    src: files/namespace.yml
+    src: roles/deploy_database/common/files/namespace.yml

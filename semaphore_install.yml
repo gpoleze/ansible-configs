@@ -1,4 +1,4 @@
-- hosts: semaphore
+- hosts: "{{ remote_host | default('localhost') }}"
   remote_user: "{{ remote_user | default('ubuntu') }}"
   become: true
   roles:

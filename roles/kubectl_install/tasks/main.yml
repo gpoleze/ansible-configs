@@ -1,20 +1,31 @@
-- name: Update the apt package index and install required packages
-  apt:
-    update_cache: yes
-    name:
-    - apt-transport-https 
-    - ca-certificates 
-    state: present
-
 - name: Add Apt key
   apt_key:
     url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
     keyring: /usr/share/keyrings/kubernetes-archive-keyring.gpg
     state: present
 
+- name: Adding apt repository for Kubernetes
+  apt_repository:
+    repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+    filename: kubernetes.list
 
 - name: Install kubectl
   apt:
     update_cache: yes
     name: kubectl
     state: present
+
+- name: Create .kube folder
+  file:
+    state: directory
+    path: "/home/{{ remote_user | default('ubuntu') }}/.kube"
+
+- name: Add kubeconfig to .kube
+  copy:
+    src: "{{ lookup('template', 'roles/kubectl_install/templates/kubeconfig.yml.js') }}"
+    dest: "/home/{{ remote_user | default('ubuntu') }}/.kube/config"
+    owner: root
+    group: root
+    mode: '0644'
+    backup: yes

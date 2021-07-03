@@ -1,0 +1,109 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: torrent-server
+  namespace: "{{ namespace }}"
+  labels:
+    name:  torrent-server
+spec:
+  selector:
+    matchLabels:
+      app: torrent-server
+  template:
+    metadata:
+      labels:
+        app: torrent-server
+    spec:
+      containers:
+      - image:  gpoleze/speedtest
+        name:  speedtest
+        tty: true
+      - image:  bubuntux/nordvpn
+        name:  vpn
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "{{ resources.vpn.cpu.min }}"
+            memory: "{{ resources.vpn.memory.min }}"
+          limits:
+            cpu: "{{ resources.vpn.cpu.max }}"
+            memory: "{{ resources.vpn.memory.max }}"
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+            - SYS_MODULE
+        envFrom:
+          - secretRef:
+              name: nordvpn-secrets
+          - configMapRef:
+              name: vpn-config
+        startupProbe:
+          exec:
+            command: ["/usr/bin/nordvpn", "status", "|", "grep", "'Status: Connected'"]
+          initialDelaySeconds: 60
+          timeoutSeconds: 10
+        livenessProbe:
+          exec:
+            command: ["/usr/bin/nordvpn", "status", "|", "grep", "'Status: Connected'"]
+          initialDelaySeconds: 30
+          timeoutSeconds: 10
+      - image: linuxserver/rutorrent
+        name: torrent
+        imagePullPolicy: Always
+        ports:
+        - name:  http
+          containerPort:  80
+        - name:  scgi
+          containerPort: 5000
+        - name:  bit-torrent-tcp
+          containerPort:  51413
+        - name:  bit-torrent-udp
+          containerPort:  6881
+          protocol: UDP
+        resources:
+          requests:
+            cpu: "{{ resources.torrent.cpu.min }}"
+            memory: "{{ resources.torrent.memory.min }}"
+          limits:
+            cpu: "{{ resources.torrent.cpu.max }}"
+            memory: "{{ resources.torrent.memory.max }}"
+        envFrom:
+          - configMapRef:
+              name: torrent-config
+        env:
+          - name: TZ
+            valueFrom:
+              configMapKeyRef:
+                key: timezone
+                name: timezone-configmap
+        volumeMounts:
+        - mountPath: /config
+          name: config
+{% for volume in volumes %}        
+        - mountPath: /{{ volume }}
+          name: {{ volume }}
+{% endfor %}
+        startupProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 90
+          timeoutSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 30
+          timeoutSeconds: 10
+      volumes:
+        - name: config
+          nfs:
+            server: "{{ nfs_server_ip }}"
+            path: "{{ nfs_base_path }}/k8svolumes/qbittorrent"
+{% for volume in volumes %}        
+        - name: {{ volume }}
+          persistentVolumeClaim:
+            claimName: nfs-{{ volume }}-pvc
+{% endfor %}

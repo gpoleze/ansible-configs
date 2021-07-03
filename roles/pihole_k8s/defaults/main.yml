@@ -1,7 +1,14 @@
+k8s_cluster_master_ip: 192.168.0.56
+load_balancer_ip: 192.168.0.64
+
 dns_provider: cloudflare
 dns_providers:
-  cloudflare: 1.1.1.1
-  google: 8.8.8.8
+  cloudflare:
+    primary: 1.1.1.1
+    secondary: 1.1.0.0
+  google:
+    primary: 8.8.8.8
+    secondary: 4.4.4.4
 
 pihole_base: "/mnt/data/pihole"
 

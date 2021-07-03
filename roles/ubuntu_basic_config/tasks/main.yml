@@ -1,0 +1,18 @@
+- name: Update Ubuntu
+  apt:
+    update_cache: yes
+    upgrade: dist
+
+- name: Coonfiguring auto updates
+  command: dpkg-reconfigure --priority low unattended-upgrades -f noninteractive
+
+- name: Adjusting Timezone
+  command: timedatectl set-timezone America/Vancouver
+
+- name: Adjust Hostname
+  when: "hostname | default(False)"
+  command: "hostnamectl set-hostname {{ hostname }}"
+
+- name: Reboot
+  reboot:
+    msg: Reboot process started

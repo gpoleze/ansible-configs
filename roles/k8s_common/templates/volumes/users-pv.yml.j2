@@ -1,0 +1,27 @@
+
+{% for folder in tracked_folders %}
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-{{ folder.name }}-pv-{{ namespace }}
+  labels:
+    location: nfs
+    type: shared
+    target: {{ folder.name }}
+    namespace: {{ namespace }}
+spec:
+  storageClassName: nfs
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteMany
+  mountOptions:
+    - hard
+    - nfsvers=3
+  nfs:
+    server: {{ nfs_server_ip }}
+    path: "{{ nfs_mount_path }}{{ folder.path }}"
+
+{% endfor %}

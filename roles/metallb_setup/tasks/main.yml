@@ -5,6 +5,7 @@
     repo: metallb
     action: latest_release
   register: metallb_latest_release
+  delegate_to: localhost
 
 - name: Deploy metallb namespace
   command: "kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/{{ metallb_latest_release.tag }}/manifests/namespace.yaml"
@@ -24,3 +25,34 @@
     k8_namespace: metallb-system
     retries: 20
     delay: 3
+
+- name: Check if memberlist secret exists
+  command: kubectl get secret -n metallb-system memberlist
+  register: memberlist_result
+  ignore_errors: yes
+
+- name: Create memberlist secret
+  command: kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
+  when: "'NotFound' in memberlist_result.stderr"
+  register: memberlist_secret_creation
+  changed_when: "'configured' in memberlist_secret_creation.stdout"
+
+- name: create tmp folder
+  file:
+    name: tmp
+    state: directory
+
+- name: template ConfigMap
+  template: 
+    src:  templates/configmap.yml.j2
+    dest: tmp/configmap.yml
+
+- name: Add ConfigMap
+  command: "kubectl apply -f tmp/configmap.yml"
+  register: metallb_configmap_deploy
+  changed_when: "'configured' in metallb_configmap_deploy.stdout"
+
+- name: Clean up
+  file:
+    name: tmp
+    state: absent

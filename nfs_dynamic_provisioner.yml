@@ -1,0 +1,7 @@
+---
+- hosts: localhost
+  tasks:
+  - name: Deploy pihole
+    block:
+    - include_role:
+        name: nfs_dynamic_provisioner

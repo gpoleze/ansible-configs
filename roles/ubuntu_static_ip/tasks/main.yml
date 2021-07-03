@@ -1,0 +1,10 @@
+- name: Copy netplan file
+  template:
+    src: templates/50-cloud-init.yaml.j2
+    dest: /etc/netplan/50-cloud-init.yaml 
+    mode: "0644"
+  become: true
+
+- name: restart netplan
+  command: netplan apply --debug
+  become: true

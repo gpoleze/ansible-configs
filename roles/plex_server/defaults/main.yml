@@ -1,0 +1,26 @@
+plex_namespace: applications
+nfs_server_ip: 192.168.0.225
+nfs_mount_path: /mnt/storage0
+plex_advertise_ip: http://192.168.0.66:32400/
+plex_image: gpoleze/pms-docker:latest
+resources:
+  min:
+    cpu: "500m"
+    memory: "256Mi"
+  max:
+    cpu: "2000m"
+    memory: "2Gi"
+plex_uid: 1001
+plex_gid: 1002
+plex_extra_ports:
+  tcp:
+  - { number: 3005, name: "plex-home-thtr" }
+  - { number: 8324, name: "plex-for-roku" }
+  - { number: 32469, name: "plex-dlna-tcp" }
+  udp:
+  - { number: 1900, name: "plex-dlna-udp" }
+  - { number: 5353, name: "bonjour-avahi" }
+  - { number: 32410, name: "gdm-net-disc-1" }
+  - { number: 32412, name: "gdm-net-disc-2" }
+  - { number: 32413, name: "gdm-net-disc-3" }
+  - { number: 32414, name: "gdm-net-disc-4" }

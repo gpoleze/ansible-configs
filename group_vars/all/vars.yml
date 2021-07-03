@@ -16,3 +16,14 @@ microk8s_cluster:
   certificate_authority_data: "{{ vault_microk8s_cluster.certificate_authority_data }}"
   token: "{{ vault_microk8s_cluster.token }}"
   ip: 192.169.0.160
+
+# NordVpn
+nordvpn_username: "{{ vault_nordvpn_username }}"
+nordvpn_password: "{{ vault_nordvpn_password }}"
+
+# Plex
+plex_claim: "{{ vault_plex_claim }}"
+
+# Code Server
+code_server_sudo_password: "{{ vault_code_server_sudo_password }}"
+code_server_login_password: "{{ vault_code_server_login_password }}"

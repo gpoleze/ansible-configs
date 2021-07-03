@@ -1,4 +1,6 @@
 namespace: applications
+nfs_server_ip: 192.168.0.225
+nfs_mount_path: /mnt/storage0/k8svolumes
 
 ## Server Properties 
 # keys from https://hub.docker.com/r/itzg/minecraft-bedrock-server

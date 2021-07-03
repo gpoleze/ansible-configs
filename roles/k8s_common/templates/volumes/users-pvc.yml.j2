@@ -1,0 +1,24 @@
+
+{% for folder in tracked_folders %}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: "nfs-{{ folder.name }}-pvc"
+  namespace: {{ namespace }}
+  labels:
+    type: shared
+    target: {{ folder.name }}
+spec:
+  storageClassName: nfs
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Gi
+  selector:
+    matchLabels:
+      type: shared
+      target: {{ folder.name }}
+      namespace: {{ namespace }}
+{% endfor %}

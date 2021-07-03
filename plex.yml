@@ -1,0 +1,13 @@
+---
+- hosts: localhost
+  tasks:
+  - name: Deploy plex
+    block:
+    - include_role:
+        name: plex_server
+
+    always:
+    - name: Cleanup template files
+      file:
+        path: "tmp"
+        state: absent

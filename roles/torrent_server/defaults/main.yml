@@ -1,0 +1,28 @@
+namespace: applications
+nfs_server_ip: 192.168.0.225
+nfs_base_path: /mnt/storage0
+nfs_puid: 1002
+nfs_pgid: 1001
+
+resources:
+  vpn:
+    cpu:
+      min: 20m
+      max: 100m
+    memory:
+      min: 128Mi
+      max: 256Mi
+  torrent:
+    cpu:
+      min: 100m
+      max: 1000m
+    memory:
+      min: 256Mi
+      max: 512Mi
+
+volumes:
+- gabriel
+- gisele
+- plex
+- downloads
+    

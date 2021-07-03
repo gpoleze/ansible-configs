@@ -1,0 +1,46 @@
+- name: Creat tmp folder
+  file:
+    name: "{{ item }}"
+    state: directory
+  with_items:
+    - tmp_volume
+    - tmp_volume/volumes
+    - tmp_volume/config_maps
+
+- name: Template files
+  template:
+    src: "templates/{{ item }}.yml.j2"
+    dest: "tmp_volume/{{ item }}.yml"
+  with_items:
+  - volumes/users-pvc
+  - volumes/users-pv
+  - config_maps/timezone
+
+- name: Deploy PV's
+  command: >-
+    kubectl apply -f tmp_volume/{{ item }}.yml --record
+  changed_when: "'created' in deploy_pv_output.stdout or 'configured' in deploy_pv_output.stdout"
+  register: deploy_pv_output
+  with_items:
+  - volumes/users-pv
+
+- name: Deploy PVC's
+  command: >-
+    kubectl apply -f tmp_volume/{{ item }}.yml --record
+  changed_when: "'created' in deploy_pvc_output.stdout or 'configured' in deploy_pvc_output.stdout"
+  register: deploy_pvc_output
+  with_items:
+  - volumes/users-pvc
+
+- name: Deploy Config Maps
+  command: >-
+    kubectl apply -f tmp_volume/{{ item }}.yml --record
+  changed_when: "'created' in deploy_cfg_map_output.stdout or 'configured' in deploy_cfg_map_output.stdout"
+  register: deploy_cfg_map_output
+  with_items:
+  - config_maps/timezone
+
+- name: Remove tmp_volume folder
+  file:
+    name: tmp_volume
+    state: absent

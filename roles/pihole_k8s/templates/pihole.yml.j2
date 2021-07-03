@@ -1,23 +1,13 @@
 ---
-apiVersion: v1
-stringData:
- PIHOLE_WEBPASSWORD: "{{ pihole_web_password }}"
-kind: Secret
-metadata:
- name: pihole-environment-variables
- namespace: {{ namespace }}
-type: Opaque
-
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: pihole
   labels:
     app: pihole
-  namespace: {{ namespace }}
+  namespace: "{{ namespace }}"
 spec:
-  replicas: 1
+  replicas: 2
   revisionHistoryLimit: 5
   selector:
     matchLabels: 
@@ -32,6 +22,9 @@ spec:
       - name: pihole-container
         image: pihole/pihole:latest
         imagePullPolicy: Always
+        securityContext:
+          capabilities:
+            add: ["NET_ADMIN", "SYS_NICE"]
         resources:
           requests:
             cpu: "250m"
@@ -40,82 +33,48 @@ spec:
             cpu: "750m"
             memory: "512M"
         ports:
-        - name: liveness-port
+        - name: http-port
           containerPort: 80
-        readinessProbe:
+        - name: https-port
+          containerPort: 443
+        - name: dns-port-tcp
+          containerPort: 53
+        - name: dns-port-udp
+          containerPort: 53
+          protocol: UDP
+        - name: dnssec-port-tcp
+          containerPort: 853
+        - name: dnssec-port-udp
+          containerPort: 853
+          protocol: UDP
+        livenessProbe:
           httpGet:
-            path: /admin
-            port: liveness-port
-          initialDelaySeconds: 5
-          periodSeconds: 5
+            path: /admin/index.html
+            port: http-port
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        startupProbe:
+          httpGet:
+            path: /admin/index.html
+            port: http-port
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        envFrom:
+          - secretRef:
+              name: pihole-secrets
+          - configMapRef:
+              name: dns-providers-configmap
         env:
         - name: TZ
-          value: America/Vancouver
-        - name: WEBPASSWORD
           valueFrom:
-            secretKeyRef:
-              name: pihole-environment-variables
-              key: PIHOLE_WEBPASSWORD
-        - name: DNS1
-          value: "1.1.1.1"
-        - name: DNS2
-          value: "1.0.0.1"
-          value: "192.168.0.150"
+            configMapKeyRef:
+              name: timezone-configmap
+              key: timezone
         volumeMounts:
         - mountPath: /etc/pihole/
           name: pihole-volume
-        - mountPath: /etc/dnsmasq.d/
-          name: dnsmasq-volume
-              
+
       volumes:
       - name: pihole-volume
         persistentVolumeClaim:
-          claimName: pihole-pvc-pihole
-      - name: dnsmasq-volume
-        persistentVolumeClaim:
-          claimName: pihole-pvc-dnsmasq
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: pihole-service-tcp
-  namespace: {{ namespace }}
-  annotations:
-    metallb.universe.tf/address-pool: microk8s-ip-space
-    metallb.universe.tf/allow-shared-ip: pihole_shared_dns
-spec:
-  selector:
-    app: pihole
-  type: LoadBalancer
-  loadBalancerIP: 192.168.0.150
-  ports:
-  - port: 80
-    targetPort: 80
-    name: pihole-admin
-  - port: 53
-    targetPort: 53
-    protocol: TCP
-    name: dns-tcp
-  externalTrafficPolicy: Local
-  
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: pihole-service-udp
-  namespace: {{ namespace }}
-  annotations:
-    metallb.universe.tf/address-pool: microk8s-ip-space
-    metallb.universe.tf/allow-shared-ip: pihole_shared_dns
-spec:
-  selector:
-    app: pihole
-  type: LoadBalancer
-  loadBalancerIP: 192.168.0.150
-  ports:
-  - port: 53
-    targetPort: 53
-    protocol: UDP
-    name: dns-udp
-  externalTrafficPolicy: Local
+          claimName: nfs-pihole-pvc

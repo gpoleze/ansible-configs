@@ -1,0 +1,13 @@
+---
+- name: Configure and Deploy NFS Dynamic Storage Provisioner
+  block:
+  - name: create tmp
+    file:
+      path: tmp
+      state: directory
+
+  always:
+  - name: Clean up
+    file:
+      path: tmp
+      state: absent

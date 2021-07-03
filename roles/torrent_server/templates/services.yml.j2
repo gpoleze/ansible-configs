@@ -1,0 +1,39 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name:  torrent-server-tcp-svc
+  namespace: {{ namespace }}
+  annotations:
+    metallb.universe.tf/allow-shared-ip: torrent_shared_dns
+spec:
+  selector:
+    app: torrent-server
+  type:  LoadBalancer
+  ports:
+  - name:  http
+    port:  80
+    targetPort:  80
+  - name:  scgi
+    port:  5000
+    targetPort:  5000
+  - name:  bit-torrent-tcp
+    port:  51413
+    targetPort:  51413
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name:  torrent-server-udp-svc
+  namespace: {{ namespace }}
+  annotations:
+    metallb.universe.tf/allow-shared-ip: torrent_shared_dns
+spec:
+  selector:
+    app: torrent-server
+  type:  LoadBalancer
+  ports:
+  - name:  bit-torrent-udp
+    port:  6881
+    targetPort:  6881
+    protocol: UDP

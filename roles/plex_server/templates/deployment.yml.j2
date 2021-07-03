@@ -1,0 +1,80 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plex
+  namespace: {{ plex_namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: plex
+  template:
+    metadata:
+      labels:
+        app: plex
+    spec:
+      containers:
+      - name: plex-container
+        image: {{ plex_image }}
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: {{ resources.min.memory }}
+            cpu: {{ resources.min.cpu }}
+          limits:
+            memory: {{ resources.max.memory }}
+            cpu: {{ resources.max.cpu }}
+        startupProbe:
+          httpGet:
+            path: /web
+            port: pms-port
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /web
+            port: pms-port
+          initialDelaySeconds: 30
+          periodSeconds: 5
+        envFrom:
+        - configMapRef:
+            name: plex-cm
+        - secretRef:
+           name: plex-secrets
+        env:
+        - name: TZ
+          valueFrom:
+            configMapKeyRef:
+              key: timezone
+              name: timezone-configmap
+        ports:
+        - containerPort: 32400
+          name: pms-port
+        # TCP PORTS
+{% for port in plex_extra_ports.tcp %}
+        - containerPort: {{ port.number }}
+          name: {{ port.name }}
+{% endfor %}
+        # UDP PORTS
+{% for port in plex_extra_ports.udp %}
+        - containerPort: {{ port.number }}
+          name: {{ port.name }}
+          protocol: UDP
+{% endfor %}
+        volumeMounts:
+          - name: plex-volume
+            mountPath: /config
+            subPath: config
+          - name: plex-volume
+            mountPath: /transcode
+            subPath: transcode
+          - name: media-volume
+            mountPath: /media
+      volumes:
+        - name: plex-volume
+          persistentVolumeClaim:
+            claimName: plex-config-pvc
+        - name: media-volume
+          persistentVolumeClaim:
+            claimName: nfs-plex-pvc

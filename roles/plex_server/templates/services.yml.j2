@@ -1,0 +1,43 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name:  plex-svc-tcp
+  namespace: {{ plex_namespace }}
+  annotations:
+    metallb.universe.tf/allow-shared-ip: plex_shared_dns
+spec:
+  selector:
+    app:  plex
+  type:  LoadBalancer
+  externalTrafficPolicy: Cluster
+  ports:
+  - name: pms-port
+    port: 32400
+    targetPort: 32400
+{% for port in plex_extra_ports.tcp %}
+  - name: {{ port.name }}
+    port: {{ port.number }}
+    targetPort: {{ port.number }}
+{% endfor %}
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name:  plex-svc-udp
+  namespace: {{ plex_namespace }}
+  annotations:
+    metallb.universe.tf/allow-shared-ip: plex_shared_dns
+spec:
+  selector:
+    app:  plex
+  type:  LoadBalancer
+  externalTrafficPolicy: Cluster
+  ports:
+{% for port in plex_extra_ports.udp %}
+  - name: {{ port.name }}
+    port: {{ port.number }}
+    targetPort: {{ port.number }}
+    protocol: UDP
+{% endfor %}

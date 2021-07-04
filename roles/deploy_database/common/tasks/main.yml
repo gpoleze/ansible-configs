@@ -1,4 +1,5 @@
 - name:  Create namespace
-  k8s:
+  kubernetes.core.k8s:
     state: present
     src: roles/deploy_database/common/files/namespace.yml
+    kubeconfig: ~/.kube/local-cluster-kubeconfig

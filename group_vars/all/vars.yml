@@ -1,4 +1,8 @@
 ---
+nfs:
+  server_ip: 192.168.0.225
+  base_path: /mnt/storage0/k8svolumes
+
 # Ansible itself related variable
 ansible_sudo_pass: "{{ vault_ansible_sudo_pass }}"
 user_ansible_keys:

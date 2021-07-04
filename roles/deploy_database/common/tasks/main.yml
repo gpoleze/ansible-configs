@@ -1,5 +1,12 @@
 - name:  Create namespace
   kubernetes.core.k8s:
+    kubeconfig: ~/.kube/local-cluster-kubeconfig
     state: present
     src: roles/deploy_database/common/files/namespace.yml
+
+- name:  Deploy Volumes
+  kubernetes.core.k8s:
     kubeconfig: ~/.kube/local-cluster-kubeconfig
+    state: present
+    template: "volumes.yml.j2"
+

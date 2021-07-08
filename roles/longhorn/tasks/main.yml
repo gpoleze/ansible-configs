@@ -1,0 +1,37 @@
+- name: Installing required packages
+  apt:
+    name:
+      - open-iscsi
+      - bash
+      - curl
+      - findmnt
+      - grep
+      - awk
+      - blkid
+      - lsblk
+    state: present
+    update-cache: yes
+
+- name: Enabling mount propagation
+  block:
+  - name: Create systemd Docker Service 
+    file:
+      status: directory
+      path: /etc/systemd/system/docker.service.d
+
+  - name: Create mount_propagation_flags file
+    copy:
+      status: present
+      path: /etc/systemd/system/docker.service.d/mount_propagation_flags.conf
+      src: files/mount_propagation_flags.conf
+
+  - name: Restart systemd services
+    systemd:
+      state: restarted
+      name: "{{ item }}"
+    with_items:
+      - daemon-reload
+      - docker
+  
+  tags: mount_propagation
+  

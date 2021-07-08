@@ -35,3 +35,7 @@
   
   tags: mount_propagation
   
+- name: Making sure all reuirements are met
+  shell: curl -sSfL https://raw.githubusercontent.com/longhorn/longhorn/v0.8.1/scripts/environment_check.sh | bash
+  register: output
+  failed_when: not output.stderr

@@ -1,0 +1,26 @@
+- name: Install helm - MacOS
+  homebrew:
+    name: helm
+    state: present
+  when: ansible_distribution.lower() == 'macosx'
+  
+- name: Install helm - Debian/Ubuntu
+  block:
+  - name: Add keys
+    apt_key:
+      url: https://baltocdn.com/helm/signing.asc
+      state: present
+  
+  - name: Add repo
+    apt_repository:
+      repo: deb https://baltocdn.com/helm/stable/debian/ all main
+      state: present
+
+  - name: install packages
+    apt:
+      name: 
+      - apt-transport-https
+      - helm
+      update_cache: yes
+
+  when: ansible_distribution.lower() in ['debian', 'ubuntu']

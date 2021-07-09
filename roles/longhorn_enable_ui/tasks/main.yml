@@ -1,0 +1,17 @@
+- name: Encrypt password
+  shell: >-
+    openssl passwd -stdin -apr1 <<< $\{{{ longhorn_ui_password }}\}
+  register: encrypted_password
+  no_log: true
+
+- name: Create secret
+  k8s:
+    template: secret.yml.j2
+  vars: 
+    longhorn_ui_password_encrypted: .
+  # command: >-
+  #   kubectl -n longhorn-system create secret generic basic-auth --from-file=auth
+  register: secret_creation
+  failed_when: secret_creation.stderr | bool
+
+- name: Deploy Ingress controller

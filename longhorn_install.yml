@@ -1,0 +1,22 @@
+# - hosts: k8s-nodes
+#   become: true
+#   remote_user: "{{ remote_user | default('ubuntu') }}"
+#   roles:
+#   - longhorn_prepare_environmetn
+
+- hosts: localhost
+  become: true
+  pre_tasks:
+  - name: Install helm
+    include_role:
+      name: helm_install
+
+  # tasks:
+  # - name: Get files
+  #   git:
+  #     repo: https://github.com/longhorn/longhorn
+  #     dest: /tmp/ansible-examples
+  #     single_branch: yes
+  #     version: master
+  
+  # - name: 

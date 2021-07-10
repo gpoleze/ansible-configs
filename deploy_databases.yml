@@ -2,10 +2,7 @@
 - name: Deploy Databases
   hosts: localhost
   remote_user: ansible
-  become: true
-  collections:
-    - kubernetes.core
   roles:
-#    - kubectl_install
+    - kubectl_install
     - deploy_database/common
     - deploy_database/mariadb

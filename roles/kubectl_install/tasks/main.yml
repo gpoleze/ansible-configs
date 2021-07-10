@@ -1,31 +1,37 @@
-- name: Add Apt key
-  apt_key:
-    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-    keyring: /usr/share/keyrings/kubernetes-archive-keyring.gpg
-    state: present
+- name: Check kubectl exists
+  command: command -v kubectl
+  register: has_kubectl
 
-- name: Adding apt repository for Kubernetes
-  apt_repository:
-    repo: deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main
-    state: present
-    filename: kubernetes.list
+- block:
+  - name: Add Apt key
+    apt_key:
+      url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+      keyring: /usr/share/keyrings/kubernetes-archive-keyring.gpg
+      state: present
 
-- name: Install kubectl
-  apt:
-    update_cache: yes
-    name: kubectl
-    state: present
+  - name: Adding apt repository for Kubernetes
+    apt_repository:
+      repo: deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main
+      state: present
+      filename: kubernetes.list
 
-- name: Create .kube folder
-  file:
-    state: directory
-    path: "/home/{{ remote_user | default('ubuntu') }}/.kube"
+  - name: Install kubectl
+    apt:
+      update_cache: yes
+      name: kubectl
+      state: present
 
-- name: Add kubeconfig to .kube
-  template:
-    src: templates/kubeconfig.yml.j2
-    dest: "/home/{{ remote_user | default('ubuntu') }}/.kube/config"
-    owner: root
-    group: root
-    mode: '0644'
-  no_log: true
+  - name: Create .kube folder
+    file:
+      state: directory
+      path: "/home/{{ remote_user | default('ubuntu') }}/.kube"
+
+  - name: Add kubeconfig to .kube
+    template:
+      src: templates/kubeconfig.yml.j2
+      dest: "/home/{{ remote_user | default('ubuntu') }}/.kube/config"
+      owner: root
+      group: root
+      mode: '0644'
+    no_log: true
+  when: not has_kubectl.stdout

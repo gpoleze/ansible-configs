@@ -1,8 +1,8 @@
-- name: Deploy Mysql
+- name: Deploy MariaDB
   kubernetes.core.k8s:
     template: "{{ item }}.yml.j2"
-    kubeconfig: ~/.kube/local-cluster-kubeconfig
     state: present
+    kubeconfig: "{{ kubeconfig_path | default(omit) }}"
   with_items:
     - services
     - secrets

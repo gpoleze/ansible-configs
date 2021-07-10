@@ -1,2 +1,0 @@
-nfs_mount_path: "{{ nfs.base_path }}/databases/mysql"
-nfs_server_ip: "{{ nfs.server_ip }}"

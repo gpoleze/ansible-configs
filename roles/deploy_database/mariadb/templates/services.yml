@@ -1,0 +1,32 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb-external-svc
+  namespace: databases
+spec:
+  selector:
+    statefulset.kubernetes.io/pod-name: mariadb-0
+  ports:
+    - name: default-mariadb-port
+      port: 3306
+      targetPort: 3306
+      protocol: TCP
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb-svc
+  namespace: databases
+spec:
+  selector:
+    database: mariadb
+  ports:
+    - name: default-mariadb-port
+      port: 3306
+      targetPort: 3306
+      protocol: TCP
+  clusterIP: None

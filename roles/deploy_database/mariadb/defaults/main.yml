@@ -1,0 +1,2 @@
+nfs_mount_path: "{{ nfs.base_path }}/databases/mariadb"
+nfs_server_ip: "{{ nfs.server_ip }}"

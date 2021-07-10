@@ -3,6 +3,9 @@
   hosts: localhost
   remote_user: ansible
   become: true
+  collections:
+    - kubernetes.core
   roles:
 #    - kubectl_install
-    - deploy_database/mysql
+    - deploy_database/common
+    - deploy_database/mariadb

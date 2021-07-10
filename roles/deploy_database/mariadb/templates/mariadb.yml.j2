@@ -1,0 +1,44 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mariadb
+  namespace: databases
+  labels:
+    database: mariadb
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      database: mariadb
+  serviceName: mariadb-db-svc
+  template:
+    metadata:
+      labels:
+        database: mariadb
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: mariadb
+          image: mariadb
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: default-db
+              containerPort: 3306
+          envFrom:
+            - secretRef:
+                name: mariadb-secrets
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mariadb-pv-claim
+  volumeClaimTemplates:
+    - metadata:
+        name: mariadb-pv-claim
+        namespace: databases
+      spec:
+        storageClassName: longhorn
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 20Gi

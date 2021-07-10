@@ -1,0 +1,9 @@
+- name: Deploy Mysql
+  kubernetes.core.k8s:
+    template: "{{ item }}.yml.j2"
+    kubeconfig: ~/.kube/local-cluster-kubeconfig
+    state: present
+  with_items:
+    - services
+    - secrets
+    - mariadb
